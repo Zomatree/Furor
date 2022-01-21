@@ -1,0 +1,12 @@
+#main {
+    height: 100%;
+    width: 100%;
+}
+
+:root {
+    --border-radius: 6px;
+}
+
+button {
+    cursor: pointer;
+}
