@@ -106,7 +106,7 @@ pub struct Message {
     #[serde(default)]
     pub attachments: Vec<Asset>,
 
-    pub edited: Option<MessageEdited>,
+    pub edited: Option<String>,
 
     #[serde(default)]
     pub embeds: Vec<Embed>,

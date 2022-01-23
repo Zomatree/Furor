@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 use crate::lib::types::{
-    message::{Message, MessageEdited, Embed},
+    message::{Message, Embed},
     user::{User, RelationStatus},
     server::Server,
     channel::Channel,
@@ -12,7 +12,7 @@ use crate::lib::types::{
     member::MemberId
 };
 
-use super::role::Role;
+use super::{role::Role, user::UserStatus, message::MessageEdited};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(tag = "type")]
@@ -34,7 +34,7 @@ pub enum SendMessage {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct ChannelUpdateData {
     pub name: Option<String>,
-    pub recipients: Option<String>,
+    pub recipients: Option<Vec<String>>,
     pub description: Option<String>
 }
 
@@ -73,9 +73,51 @@ pub struct ServerMemberUpdateData {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct ServerRoleUpdateData {
+    pub name: Option<String>,
+    pub colour: Option<String>,
+    pub hoist: Option<bool>,
+    pub rank: Option<i16>
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub enum ServerRoleUpdateClear {
+    Colour
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub enum ServerMemberUpdateClear {
     Nickname,
     Avatar
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct UserUpdateData {
+    pub status: Option<UserStatus>,
+
+    #[serde(rename = "profile.background")]
+    pub profile_background: Option<Asset>,
+
+    #[serde(rename = "profile.content")]
+    pub profile_content: Option<String>,
+
+    pub avatar: Option<Asset>,
+    pub online: Option<bool>
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub enum UserUpdateClear {
+    ProfileContent,
+    ProfileBackground,
+    StatusText,
+    Avatar
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct MessageUpdateData {
+    pub edited: MessageEdited,
+    pub content: Option<String>,
+    pub embeds: Option<Vec<Embed>>
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -99,10 +141,9 @@ pub enum ReceiveMessage {
     },
     MessageUpdate {
         id: String,
+        channel: String,
 
-        content: Option<String>,
-        edited: MessageEdited,
-        embeds: Option<Vec<Embed>>
+        data: MessageUpdateData
     },
     MessageDelete {
         id: String,
@@ -129,6 +170,10 @@ pub enum ReceiveMessage {
         user: String
     },
     ChannelStartTyping {
+        id: String,
+        user: String
+    },
+    ChannelStopTyping {
         id: String,
         user: String
     },
@@ -171,7 +216,7 @@ pub enum ReceiveMessage {
     UserUpdate {
         id: String,
         data: UserUpdateData,
-        clear: UserUpdateClear
+        clear: Option<UserUpdateClear>
     },
     UserRelationship {
         id: String,

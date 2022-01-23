@@ -5,7 +5,8 @@ use crate::{
         state::State,
         http::HTTPClient,
         types::{
-            message::Message
+            message::Message,
+            channel::Channel
         }
     },
     println
@@ -21,15 +22,21 @@ struct Events;
 #[async_trait::async_trait]
 impl EventHandler for Events {
     async fn on_authenticate(&self, state: &mut State, http: &HTTPClient) {
-        println!("authenticated {:?} {:?}", state, http);
     }
 
     async fn on_ready(&self, state: &mut State, http: &HTTPClient) {
-        println!("ready {:?} {:?}", state, http);
     }
 
     async fn on_message(&self, state: &mut State, http: &HTTPClient, message: Message) {
-        println!("{}: {}", state.get_user(&message.author).unwrap().username, message.content);
+    }
+
+    async fn on_message_update(&self, state: &mut State, http: &HTTPClient, message: Message) {
+    }
+
+    async fn on_message_delete(&self, state: &mut State, http: &HTTPClient, message: Message) {
+    }
+
+    async fn on_channel_create(&self, state: &mut State, http: &HTTPClient, channel: Channel) {
     }
 }
 
