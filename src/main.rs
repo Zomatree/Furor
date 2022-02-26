@@ -2,13 +2,13 @@
 #![feature(async_closure)]
 #![allow(non_snake_case)]
 
-pub mod types;
 pub mod http;
+pub mod types;
 
-use std::collections::HashMap;
 use dioxus::prelude::*;
-use futures::{StreamExt, channel::mpsc, Future, SinkExt};
-use ws_stream_wasm::{WsMeta, WsMessage};
+use futures::{channel::mpsc, Future, SinkExt, StreamExt};
+use std::collections::HashMap;
+use ws_stream_wasm::{WsMessage, WsMeta};
 
 const URL: &str = "revolt.chat";
 const AUTUMN_URL: &str = "autumn.revolt.chat";
@@ -18,13 +18,35 @@ pub struct State {
     pub users: HashMap<types::ULID, types::User>,
     pub servers: HashMap<types::ULID, types::Server>,
     pub channels: HashMap<types::ULID, types::Channel>,
-    pub server_members: HashMap<types::ULID, HashMap<types::ULID, types::Member>>
+    pub server_members: HashMap<types::ULID, HashMap<types::ULID, types::Member>>,
+    pub message_cache: HashMap<types::ULID, HashMap<types::ULID, types::Message>>,
+}
+
+impl State {
+    pub fn get_or_insert_message_cache(
+        &mut self,
+        channel_id: types::ULID,
+    ) -> &mut HashMap<types::ULID, types::Message> {
+        self.message_cache
+            .entry(channel_id)
+            .or_insert_with(HashMap::new)
+    }
+
+    pub fn get_message_from_cache(
+        &self,
+        channel_id: &types::ULID,
+        message_id: &types::ULID,
+    ) -> Option<&types::Message> {
+        self.message_cache
+            .get(channel_id)
+            .and_then(|cache| cache.get(message_id))
+    }
 }
 
 #[derive(Props, PartialEq)]
 pub struct AppProps {
     pub token: types::Token,
-    pub channel: String
+    pub channel: String,
 }
 
 fn MainApp(cx: Scope<AppProps>) -> Element {
@@ -46,8 +68,11 @@ fn MainApp(cx: Scope<AppProps>) -> Element {
             let channel = channel.to_owned();
 
             async move {
-                http.send_message(types::ULID(channel), types::SendMessage::with_content(content))
-                    .await;
+                http.send_message(
+                    types::ULID(channel),
+                    types::SendMessage::with_content(content),
+                )
+                .await;
             }
         });
 
@@ -61,60 +86,77 @@ fn MainApp(cx: Scope<AppProps>) -> Element {
         let channel = cx.props.channel.clone();
 
         async move {
-            let (_, mut ws) = WsMeta::connect(format!("wss://ws.{URL}"), None).await.unwrap();
+            let (_, mut ws) = WsMeta::connect(format!("wss://ws.{URL}"), None)
+                .await
+                .unwrap();
 
-            ws.send(WsMessage::Text(serde_json::to_string(&types::SendWsMessage::Authenticate { token: token.inner() }).unwrap())).await.unwrap();
+            ws.send(WsMessage::Text(
+                serde_json::to_string(&types::SendWsMessage::Authenticate {
+                    token: token.inner(),
+                })
+                .unwrap(),
+            ))
+            .await
+            .unwrap();
 
             while let Some(WsMessage::Text(payload)) = ws.next().await {
                 match serde_json::from_str::<types::ReceiveWsMessage>(&payload) {
-                    Ok(event) => {
-                        match event {
-                            types::ReceiveWsMessage::Ready { users, servers, channels } => {
-                                set_state.with_mut(|state| {
+                    Ok(event) => match event {
+                        types::ReceiveWsMessage::Ready {
+                            users,
+                            servers,
+                            channels,
+                        } => {
+                            set_state.with_mut(|state| {
+                                for user in users {
+                                    state.users.insert(user.id.clone(), user);
+                                }
+
+                                for server in servers.clone() {
+                                    state.servers.insert(server.id.clone(), server);
+                                }
+
+                                for channel in channels {
+                                    state.channels.insert(channel.id(), channel);
+                                }
+                            });
+
+                            for server in servers {
+                                let members = http.fetch_server_members(server.id.clone()).await;
+
+                                set_state.with_mut(move |state| {
+                                    let types::ServerMembers { users, members } = members;
+
                                     for user in users {
                                         state.users.insert(user.id.clone(), user);
-                                    };
+                                    }
 
-                                    for server in servers.clone() {
-                                        state.servers.insert(server.id.clone(), server);
-                                    };
+                                    let mut member_hashmap = HashMap::new();
 
-                                    for channel in channels {
-                                        state.channels.insert(channel.id(), channel);
-                                    };
-                                });
+                                    for member in members {
+                                        member_hashmap.insert(member.id.user.clone(), member);
+                                    }
 
-                                for server in servers {
-                                    let members = http.fetch_server_members(server.id.clone()).await;
-
-                                    set_state.with_mut(move |state| {
-                                        let types::ServerMembers { users, members } = members;
-
-                                        for user in users {
-                                            state.users.insert(user.id.clone(), user);
-                                        }
-
-                                        let mut member_hashmap = HashMap::new();
-
-                                        for member in members {
-                                            member_hashmap.insert(member.id.user.clone(), member);
-                                        }
-
-                                        state.server_members.insert(server.id, member_hashmap);
-                                    })
-                                }
-                            },
-                            types::ReceiveWsMessage::Message { message } => {
-                                if message.channel.0 == channel {
-                                    set_messages.with_mut(|messages| messages.push(message))
-                                }
-                            },
-                            _ => {
-                                log::info!("IGNORED EVENT: {event:?}")
+                                    state.server_members.insert(server.id, member_hashmap);
+                                })
                             }
                         }
+                        types::ReceiveWsMessage::Message { message } => {
+                            if message.channel.0 == channel {
+                                set_messages.with_mut(|messages| messages.push(message.clone()))
+                            };
+
+                            set_state.with_mut(move |state| {
+                                let message_cache =
+                                    state.get_or_insert_message_cache(message.channel.clone());
+                                message_cache.insert(message.id.clone(), message);
+                            })
+                        }
+                        _ => {
+                            log::info!("IGNORED EVENT: {event:?}")
+                        }
                     },
-                    Err(error) => log::error!("{error:?}")
+                    Err(error) => log::error!("{error:?}"),
                 }
             }
         }
@@ -125,32 +167,39 @@ fn MainApp(cx: Scope<AppProps>) -> Element {
         div {
             style: "background-color: grey; overflow-y: auto; flex-grow: 1",
             messages.iter().map(|msg| {
-                let types::Message { content, id, author, attachments, channel, masquerade, .. } = msg;
+                let types::Message { content, id, author, attachments, channel, masquerade, replies, .. } = msg;
 
                 let user = author.to_user(state).unwrap();
-
-                let (username, avatar) = match masquerade {
-                    Some(mask) => {
-                        (mask.name.clone().unwrap_or_else(|| user.username.clone()), mask.avatar.clone().unwrap_or_else(|| user.avatar.clone().unwrap().url(AUTUMN_URL.to_string())))
-                    },
-                    None => {
-                        let channel = channel.to_channel(state).unwrap();
-
-                        match channel.server() {
-                            Some(server_id) => {
-                                let member = author.to_member(state, &server_id).unwrap();
-                                (member.nickname.clone().unwrap_or_else(|| user.username.clone()), member.avatar.clone().unwrap_or_else(|| user.avatar.clone().unwrap()).url(AUTUMN_URL.to_string()))
-                            },
-                            None => {
-                                (user.username.clone(), user.avatar.clone().unwrap().url(AUTUMN_URL.to_string()))
-                            }
-                        }
-                    }
-                };
+                let (username, avatar) = get_username_avatar(state, user, masquerade, channel);
 
                 rsx! {
                     div {
                         key: "{id}",
+                        replies.iter().map(|reply| {
+                            let types::Message { content, author, masquerade, ..} = state.get_message_from_cache(channel, reply).unwrap();
+
+                            let reply_user = author.to_user(state).unwrap();
+
+                            let (username, avatar) = get_username_avatar(state, reply_user, masquerade, channel);
+
+                            rsx! {
+                                div {
+                                    style: "display: flex; flex-direction: row",
+                                    img {
+                                        src: "{avatar}",
+                                        width: "14",
+                                        height: "14"
+                                    },
+                                    span {
+                                        "{username}"
+                                    },
+                                    span {
+                                        style: "font-size: 14px",
+                                        "{content}"
+                                    }
+                                }
+                            }
+                        }),
                         div {
                             style: "display: flex; flex-direction: row",
                             img {
@@ -161,21 +210,18 @@ fn MainApp(cx: Scope<AppProps>) -> Element {
                             h3 { "{username}" }
                         },
                         p { "{content}" }
-                        (!attachments.is_empty()).then(|| {
-                            rsx! {
-                                attachments.iter().map(|attachment| {
-                                    let url = attachment.url(AUTUMN_URL.to_string());
+                        attachments.iter().map(|attachment| {
+                            let url = attachment.url(AUTUMN_URL.to_string());
 
-                                    rsx! {
-                                        div {
-                                            img {
-                                                src: "{url}",
-                                            }
-                                        }
+                            rsx! {
+                                div {
+                                    img {
+                                        src: "{url}",
                                     }
-                                })
+                                }
                             }
                         })
+
                     }
                 }
             })
@@ -201,7 +247,10 @@ fn MainApp(cx: Scope<AppProps>) -> Element {
     })
 }
 
-pub fn use_async_channel<'a, T: 'static, F: Future<Output = ()> + 'static>(cx: &'a ScopeState, callback: impl Fn(T) -> F + 'static) -> mpsc::UnboundedSender<T> {
+pub fn use_async_channel<'a, T: 'static, F: Future<Output = ()> + 'static>(
+    cx: &'a ScopeState,
+    callback: impl Fn(T) -> F + 'static,
+) -> mpsc::UnboundedSender<T> {
     let (tx, mut rx) = mpsc::unbounded::<T>();
 
     cx.spawn(async move {
@@ -277,6 +326,46 @@ pub fn app(cx: Scope) -> Element {
             }
         }
     })
+}
+
+pub fn get_username_avatar(
+    state: &State,
+    user: &types::User,
+    masquerade: &Option<types::Masquerade>,
+    channel_id: &types::ULID,
+) -> (String, String) {
+    match masquerade {
+        Some(mask) => (
+            mask.name.clone().unwrap_or_else(|| user.username.clone()),
+            mask.avatar
+                .clone()
+                .unwrap_or_else(|| user.avatar.clone().unwrap().url(AUTUMN_URL.to_string())),
+        ),
+        None => {
+            let channel = channel_id.to_channel(state).unwrap();
+
+            match channel.server() {
+                Some(server_id) => {
+                    let member = user.id.to_member(state, &server_id).unwrap();
+                    (
+                        member
+                            .nickname
+                            .clone()
+                            .unwrap_or_else(|| user.username.clone()),
+                        member
+                            .avatar
+                            .clone()
+                            .unwrap_or_else(|| user.avatar.clone().unwrap())
+                            .url(AUTUMN_URL.to_string()),
+                    )
+                }
+                None => (
+                    user.username.clone(),
+                    user.avatar.clone().unwrap().url(AUTUMN_URL.to_string()),
+                ),
+            }
+        }
+    }
 }
 
 fn main() {
