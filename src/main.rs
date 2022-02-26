@@ -1,22 +1,17 @@
 #![feature(explicit_generic_args_with_impl_trait)]
 #![feature(async_closure)]
+#![allow(non_snake_case)]
 
 pub mod types;
 pub mod http;
 
 use std::collections::HashMap;
-
 use dioxus::prelude::*;
-use dioxus::fermi::prelude::{use_read, Atom};
 use futures::{StreamExt, channel::mpsc, Future, SinkExt};
 use ws_stream_wasm::{WsMeta, WsMessage};
 
 const URL: &str = "revolt.chat";
 const AUTUMN_URL: &str = "autumn.revolt.chat";
-const TOKEN: &str = "";
-const CHANNEL: &str = "01FD59DX5JF56V5S0B89WNF51H";
-
-static HTTP: Atom<http::HTTPClient> = |_| http::HTTPClient::new(types::Token::User(TOKEN.to_string()), format!("api.{URL}"));
 
 #[derive(Default, Clone)]
 pub struct State {
@@ -26,18 +21,32 @@ pub struct State {
     pub server_members: HashMap<types::ULID, HashMap<types::ULID, types::Member>>
 }
 
-fn app(cx: Scope) -> Element {
+#[derive(Props, PartialEq)]
+pub struct AppProps {
+    pub token: types::Token,
+    pub channel: String
+}
+
+fn MainApp(cx: Scope<AppProps>) -> Element {
     let (messages, set_messages) = use_state(&cx, Vec::<types::Message>::new);
     let (message, set_message) = use_state(&cx, String::new);
     let (state, set_state) = use_state(&cx, State::default);
-    let http = use_read(&cx, HTTP).clone();
 
     cx.use_hook(|_| {
+        let http = http::HTTPClient::new(cx.props.token.clone(), format!("api.{URL}"));
+        cx.provide_context(http);
+    });
+
+    cx.use_hook(|_| {
+        let http = cx.consume_context::<http::HTTPClient>().unwrap();
+        let channel = cx.props.channel.clone();
+
         let sender = use_async_channel::<String, _>(&cx, move |content| {
-            let http = http.clone();
+            let http = (*http).to_owned();
+            let channel = channel.to_owned();
 
             async move {
-                http.send_message(types::ULID(CHANNEL.to_string()), types::SendMessage::with_content(content))
+                http.send_message(types::ULID(channel), types::SendMessage::with_content(content))
                     .await;
             }
         });
@@ -46,14 +55,15 @@ fn app(cx: Scope) -> Element {
     });
 
     use_future(&cx, move || {
-        let http = use_read(&cx, HTTP).clone();
         to_owned![set_messages, set_state];
+        let http = cx.consume_context::<http::HTTPClient>().unwrap();
+        let token = cx.props.token.clone();
+        let channel = cx.props.channel.clone();
 
         async move {
             let (_, mut ws) = WsMeta::connect(format!("wss://ws.{URL}"), None).await.unwrap();
 
-
-            ws.send(WsMessage::Text(serde_json::to_string(&types::SendWsMessage::Authenticate { token: TOKEN.to_string() }).unwrap())).await.unwrap();
+            ws.send(WsMessage::Text(serde_json::to_string(&types::SendWsMessage::Authenticate { token: token.inner() }).unwrap())).await.unwrap();
 
             while let Some(WsMessage::Text(payload)) = ws.next().await {
                 match serde_json::from_str::<types::ReceiveWsMessage>(&payload) {
@@ -95,7 +105,7 @@ fn app(cx: Scope) -> Element {
                                 }
                             },
                             types::ReceiveWsMessage::Message { message } => {
-                                if message.channel.0.as_str() == CHANNEL {
+                                if message.channel.0 == channel {
                                     set_messages.with_mut(|messages| messages.push(message))
                                 }
                             },
@@ -113,7 +123,7 @@ fn app(cx: Scope) -> Element {
     rsx!(cx, div {
         style: "width: 100%; height: 100%; display: flex; flex-direction: column",
         div {
-            style: "background-color: grey; overflow-y: scroll; flex-grow: 1",
+            style: "background-color: grey; overflow-y: auto; flex-grow: 1",
             messages.iter().map(|msg| {
                 let types::Message { content, id, author, attachments, channel, masquerade, .. } = msg;
 
@@ -201,6 +211,72 @@ pub fn use_async_channel<'a, T: 'static, F: Future<Output = ()> + 'static>(cx: &
     });
 
     tx
+}
+
+pub fn app(cx: Scope) -> Element {
+    let (token, set_token) = use_state(&cx, String::new);
+    let (channel, set_channel) = use_state(&cx, String::new);
+    let (button_clicked, set_button_clicked) = use_state(&cx, || false);
+    let (token_type, set_token_type) = use_state(&cx, || String::from("user"));
+
+    cx.render(match button_clicked {
+        true => {
+            rsx! {
+                MainApp {
+                    token: match token_type.as_str() {
+                        "user" => types::Token::User(token.clone()),
+                        "bot" => types::Token::Bot(token.clone()),
+                        _ => unreachable!()
+                    },
+                    channel: channel.clone()
+                }
+            }
+        },
+        false => {
+            rsx! {
+                div {
+                    style: "height: 100%; width: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center",
+                    h1 { "Client" },
+                    input {
+                        style: "width: 30%; height: 48px",
+                        placeholder: "Enter token",
+                        oninput: |evt| {
+                            set_token(evt.value.clone());
+                        }
+                    },
+                    input {
+                        style: "width: 30%; height: 48px; margin-top: 12px",
+                        placeholder: "Enter channel ID",
+                        oninput: |evt| {
+                            set_channel(evt.value.clone());
+                        }
+                    },
+                    select {
+                        style: "width: 30%; height: 48px; margin-top: 12px",
+                        name: "token_type",
+                        onchange: |evt| {
+                            set_token_type(evt.value.clone())
+                        },
+                        option {
+                            value: "user",
+                            "User",
+                        },
+                        option {
+                            value: "bot",
+                            "Bot"
+                        },
+                    }
+                    button {
+                        style: "width: 8%; height: 48px; margin-top: 12px",
+                        onclick: |_| {
+                            set_button_clicked(true)
+                        },
+                        "Done",
+                    }
+                }
+            }
+        }
+    })
 }
 
 fn main() {

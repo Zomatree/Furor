@@ -62,6 +62,13 @@ impl Token {
             Token::Bot(token) => ("x-bot-token", token.clone())
         }
     }
+
+    pub fn inner(&self) -> String {
+        match self {
+            Token::User(token) => token.clone(),
+            Token::Bot(token) => token.clone(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
