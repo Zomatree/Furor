@@ -140,87 +140,87 @@ pub enum ReceiveWsMessage {
         message: Message
     },
     MessageUpdate {
-        id: ULID,
+        #[serde(rename="id")] message_id: ULID,
         channel: String,
 
         data: MessageUpdateData
     },
     MessageDelete {
-        id: ULID,
-        channel: String
+        #[serde(rename="id")] message_id: ULID,
+        #[serde(rename="channel")] channel_id: String
     },
     ChannelCreate {
         #[serde(flatten)]
         channel: Channel
     },
     ChannelUpdate {
-        id: ULID,
+        #[serde(rename="id")] channel_id: ULID,
         data: ChannelUpdateData,
         clear: Option<ChannelUpdateClear>
     },
     ChannelDelete {
-        id: ULID
+        #[serde(rename="id")] channel_id: ULID
     },
     ChannelGroupJoin {
-        id: ULID,
-        user: ULID
+        #[serde(rename="id")] channel_id: ULID,
+        #[serde(rename="user")] user_id: ULID
     },
     ChannelGroupLeave {
-        id: ULID,
-        user: ULID
+        #[serde(rename="id")] channel_id: ULID,
+        #[serde(rename="user")] user_id: ULID
     },
     ChannelStartTyping {
-        id: ULID,
-        user: ULID
+        #[serde(rename="id")] channel_id: ULID,
+        #[serde(rename="user")] user_id: ULID
     },
     ChannelStopTyping {
-        id: ULID,
-        user: ULID
+        #[serde(rename="id")] channel_id: ULID,
+        #[serde(rename="user")] user_id: ULID
     },
     ChannelAck {
-        id: ULID,
-        user: ULID,
+        #[serde(rename="id")] channel_id: ULID,
+        #[serde(rename="user")] user_id: ULID,
         message_id: ULID
     },
     ServerUpdate {
-        id: ULID,
+        #[serde(rename="id")] server_id: ULID,
         data: ServerUpdateData,
         clear: Option<ServerUpdateClear>
     },
     ServerDelete {
-        id: ULID
+        #[serde(rename="id")] server_id: ULID
     },
     ServerMemberUpdate {
-        id: MemberId,
+        #[serde(rename="id")] member_id: MemberId,
         data: ServerMemberUpdateData,
         clear: ServerMemberUpdateClear
     },
     ServerMemberJoin {
-        id: ULID,
-        user: ULID
+        #[serde(rename="id")] server_id: ULID,
+        #[serde(rename="user")] user_id: ULID
     },
     ServerMemberLeave {
-        id: ULID,
-        user: ULID
+        #[serde(rename="id")] server_id: ULID,
+        #[serde(rename="user")] user_id: ULID
     },
     ServerRoleUpdate {
-        id: ULID,
+        #[serde(rename="id")] server_id: ULID,
         role_id: ULID,
         data: ServerRoleUpdateData,
         clear: ServerRoleUpdateClear
     },
     ServerRoleDelete {
-        id: ULID,
+        #[serde(rename="id")] server_id: ULID,
         role_id: ULID
     },
     UserUpdate {
-        id: ULID,
+        #[serde(rename="id")] user_id: ULID,
         data: UserUpdateData,
         clear: Option<UserUpdateClear>
     },
     UserRelationship {
         id: ULID,
-        user: ULID,
+        #[serde(rename="user")] user_id: ULID,
         status: RelationStatus
     }
 }
