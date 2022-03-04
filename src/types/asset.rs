@@ -11,21 +11,16 @@ pub enum AssetType {
     Icons,
 }
 
-impl AssetType {
-    pub fn to_str(&self) -> &'static str {
+impl std::fmt::Display for AssetType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             AssetType::Attachments => "attachments",
             AssetType::Avatars => "avatars",
             AssetType::Backgrounds => "backgrounds",
             AssetType::Banners => "banners",
             AssetType::Icons => "icons",
-        }
-    }
-}
 
-impl std::fmt::Display for AssetType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.to_str().fmt(f)
+        }.fmt(f)
     }
 }
 
