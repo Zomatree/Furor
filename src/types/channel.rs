@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use crate::types::{
     asset::Asset,
-    role::Role,
     ulid::ULID,
+    permissions::PermissionsOverwrite
 };
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -48,10 +48,10 @@ pub enum Channel {
         icon: Option<Asset>,
 
         #[serde(default)]
-        default_permissions: u64,
+        default_permissions: PermissionsOverwrite,
 
         #[serde(default)]
-        role_permissions: HashMap<ULID, u64>,
+        role_permissions: HashMap<ULID, PermissionsOverwrite>,
 
         #[serde(default)]
         nsfw: bool,
@@ -68,10 +68,10 @@ pub enum Channel {
         icon: Option<Asset>,
 
         #[serde(default)]
-        default_permissions: u64,
+        default_permissions: PermissionsOverwrite,
 
         #[serde(default)]
-        role_permissions: HashMap<String, Role>,
+        role_permissions: HashMap<String, PermissionsOverwrite>,
 
         #[serde(default)]
         nsfw: bool,

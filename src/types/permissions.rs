@@ -1,1 +1,7 @@
-pub type Permissions = (u64, u64);
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct PermissionsOverwrite {
+    a: u64,
+    d: u64,
+}

@@ -1,15 +1,16 @@
 use reqwest::{Client, ClientBuilder, header::HeaderMap, RequestBuilder};
-use crate::types::{SendMessage, ULID, Message, Token, ServerMembers};
+use crate::prelude::*;
 
 #[derive(Debug, Clone)]
 pub struct HTTPClient {
-    pub token: Token,
+    pub token: types::Token,
     pub client: Client,
-    pub base_url: String
+    pub base_url: &'static str,
+    pub revolt_config: types::RevoltConfig
 }
 
 impl HTTPClient {
-    pub fn new(token: Token, base_url: String) -> Self {
+    pub fn new(token: types::Token, base_url: &'static str, revolt_config: types::RevoltConfig) -> Self {
         let (header_key, header_value) = token.to_header();
 
         let mut headers = HeaderMap::new();
@@ -20,18 +21,18 @@ impl HTTPClient {
             .build()
             .unwrap();
 
-        HTTPClient { token, client, base_url }
+        HTTPClient { token, client, base_url, revolt_config }
     }
 
     fn post<T: Into<String>>(&self, route: T) -> RequestBuilder {
-        self.client.post(format!("https://{}{}", self.base_url, route.into()))
+        self.client.post(format!("{}{}", self.base_url, route.into()))
     }
 
     fn get<T: Into<String>>(&self, route: T) -> RequestBuilder {
-        self.client.get(format!("https://{}{}", self.base_url, route.into()))
+        self.client.get(format!("{}{}", self.base_url, route.into()))
     }
 
-    pub async fn send_message(&self, channel_id: ULID, message: SendMessage) -> Message {
+    pub async fn send_message(&self, channel_id: &types::ULID, message: types::SendMessage) -> types::Message {
         self.post(format!("/channels/{channel_id}/messages"))
             .json(&message)
             .send()
@@ -42,7 +43,7 @@ impl HTTPClient {
             .unwrap()
     }
 
-    pub async fn fetch_server_members(&self, server_id: ULID) -> ServerMembers {
+    pub async fn fetch_server_members(&self, server_id: &types::ULID) -> types::ServerMembers {
         self.get(format!("/servers/{server_id}/members"))
             .send()
             .await
@@ -50,5 +51,21 @@ impl HTTPClient {
             .json()
             .await
             .unwrap()
+    }
+
+    pub async fn fetch_message(&self, channel_id: &types::ULID, message_id: &types::ULID) -> types::Message {
+        self.get(format!("/channels/{channel_id}/messages/{message_id}"))
+            .send()
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap()
+    }
+}
+
+impl PartialEq for HTTPClient {
+    fn eq(&self, _: &Self) -> bool {
+        true
     }
 }

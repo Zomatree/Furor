@@ -1,28 +1,7 @@
 use serde::{Deserialize, Serialize};
-use crate::{types::{user::User, channel::Channel, server::Server, member::Member}, State};
 
 #[derive(Clone, Eq)]
 pub struct ULID(pub String);
-
-impl ULID {
-    pub fn to_user<'a>(&self, state: &'a State) -> Option<&'a User> {
-        state.users.get(self)
-    }
-
-    pub fn to_channel<'a>(&self, state: &'a State) -> Option<&'a Channel> {
-        state.channels.get(self)
-    }
-
-    pub fn to_server<'a>(&self, state: &'a State) -> Option<&'a Server> {
-        state.servers.get(self)
-    }
-
-    pub fn to_member<'a>(&self, state: &'a State, server_id: &ULID) -> Option<&'a Member> {
-        state.server_members
-            .get(server_id)
-            .and_then(|members| members.get(self))
-    }
-}
 
 impl<'de> Deserialize<'de> for ULID {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>

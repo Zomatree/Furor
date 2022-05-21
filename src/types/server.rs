@@ -3,11 +3,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::types::{
     role::Role,
-    permissions::Permissions,
     asset::Asset,
     ulid::ULID,
 };
-
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Category {
@@ -42,7 +40,7 @@ pub struct Server {
     #[serde(default)]
     pub roles: HashMap<ULID, Role>,
 
-    pub default_permissions: Permissions,
+    pub default_permissions: u64,
     pub icon: Option<Asset>,
     pub banner: Option<Asset>,
 

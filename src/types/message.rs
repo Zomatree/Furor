@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::types::{asset::Asset, ulid::ULID};
+use crate::types::{asset::Asset, ulid::ULID, ws::MessageUpdateData};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub enum TwitchContentType {
@@ -101,7 +101,7 @@ pub struct Message {
     pub nonce: Option<String>,
     pub channel: ULID,
     pub author: ULID,
-    pub content: ULID,
+    pub content: Option<String>,
 
     #[serde(default)]
     pub attachments: Vec<Asset>,
@@ -118,4 +118,12 @@ pub struct Message {
     pub replies: Vec<ULID>,
 
     pub masquerade: Option<Masquerade>
+}
+
+impl Message {
+    pub fn update(&mut self, data: MessageUpdateData) {
+        if let Some(new_content) = data.content {
+            self.content = Some(new_content)
+        }
+    }
 }

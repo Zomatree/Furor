@@ -1,10 +1,10 @@
 use serde::{Deserialize, Serialize};
-use crate::types::permissions::Permissions;
+use crate::types::permissions::PermissionsOverwrite;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Role {
     pub name: String,
-    pub permissions: Permissions,
+    pub permissions: PermissionsOverwrite,
     pub colour: Option<String>,
 
     #[serde(default)]

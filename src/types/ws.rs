@@ -7,7 +7,6 @@ use crate::types::{
     server::Server,
     channel::Channel,
     asset::Asset,
-    permissions::Permissions,
     server::{Category, ServerSystemMessages},
     member::MemberId
 };
@@ -51,7 +50,7 @@ pub struct ServerUpdateData {
     pub description: Option<String>,
     pub icon: Option<Asset>,
     pub banner: Option<Asset>,
-    pub default_permissions: Option<Permissions>,
+    pub default_permissions: Option<u64>,
     pub nsfw: Option<bool>,
     pub system_messages: Option<ServerSystemMessages>,
     pub categories: Option<HashMap<String, Category>>
@@ -141,7 +140,7 @@ pub enum ReceiveWsMessage {
     },
     MessageUpdate {
         #[serde(rename="id")] message_id: ULID,
-        channel: String,
+        #[serde(rename="channel")] channel_id: ULID,
 
         data: MessageUpdateData
     },
@@ -156,7 +155,7 @@ pub enum ReceiveWsMessage {
     ChannelUpdate {
         #[serde(rename="id")] channel_id: ULID,
         data: ChannelUpdateData,
-        clear: Option<ChannelUpdateClear>
+        clear: Vec<ChannelUpdateClear>
     },
     ChannelDelete {
         #[serde(rename="id")] channel_id: ULID
@@ -185,7 +184,7 @@ pub enum ReceiveWsMessage {
     ServerUpdate {
         #[serde(rename="id")] server_id: ULID,
         data: ServerUpdateData,
-        clear: Option<ServerUpdateClear>
+        clear: Vec<ServerUpdateClear>
     },
     ServerDelete {
         #[serde(rename="id")] server_id: ULID
@@ -193,7 +192,7 @@ pub enum ReceiveWsMessage {
     ServerMemberUpdate {
         #[serde(rename="id")] member_id: MemberId,
         data: ServerMemberUpdateData,
-        clear: ServerMemberUpdateClear
+        clear: Vec<ServerMemberUpdateClear>
     },
     ServerMemberJoin {
         #[serde(rename="id")] server_id: ULID,
@@ -207,7 +206,7 @@ pub enum ReceiveWsMessage {
         #[serde(rename="id")] server_id: ULID,
         role_id: ULID,
         data: ServerRoleUpdateData,
-        clear: ServerRoleUpdateClear
+        clear: Vec<ServerRoleUpdateClear>
     },
     ServerRoleDelete {
         #[serde(rename="id")] server_id: ULID,
@@ -216,7 +215,7 @@ pub enum ReceiveWsMessage {
     UserUpdate {
         #[serde(rename="id")] user_id: ULID,
         data: UserUpdateData,
-        clear: Option<UserUpdateClear>
+        clear: Vec<UserUpdateClear>
     },
     UserRelationship {
         id: ULID,
