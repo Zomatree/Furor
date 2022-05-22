@@ -3,16 +3,16 @@ use crate::prelude::*;
 
 
 #[derive(Props, PartialEq)]
-pub struct MessageProps<'a> {
-    pub message_id: &'a types::ULID,
-    pub channel_id: &'a types::ULID
+pub struct MessageProps {
+    pub message_id: types::ULID,
+    pub channel_id: types::ULID
 }
 
-pub fn Message<'a>(cx: Scope<'a, MessageProps<'a>>) -> Element<'a> {
+pub fn Message(cx: Scope<MessageProps>) -> Element {
     let message_cache = use_read(&cx, MESSAGES);
     let message = message_cache
-        .get(cx.props.channel_id)?
-        .get(cx.props.message_id)?;
+        .get(&cx.props.channel_id)?
+        .get(&cx.props.message_id)?;
 
     let types::Message { content, author, attachments, channel, masquerade, replies, .. } = message;
 
@@ -27,10 +27,13 @@ pub fn Message<'a>(cx: Scope<'a, MessageProps<'a>>) -> Element<'a> {
                 .iter()
                 .map(|reply| {
                     rsx! {
-                        components::Reply {
-                            message_id: reply,
-                            channel_id: cx.props.channel_id,
-                            message_mentions: replies
+                        div {
+                            key: "{reply}",
+                            components::Reply {
+                                message_id: reply.clone(),
+                                channel_id: cx.props.channel_id.clone(),
+                                message_mentions: replies.clone()
+                            }
                         }
                     }
                 })
@@ -41,7 +44,12 @@ pub fn Message<'a>(cx: Scope<'a, MessageProps<'a>>) -> Element<'a> {
                     width: "44",
                     height: "44"
                 },
-                h3 { "{username}" }
+                h3 { "{username}" },
+                {user.bot.is_some().then(|| rsx! {
+                    span {
+                        "[BOT]"
+                    }
+                })}
             },
             p { "{content}" }
             attachments.iter().enumerate().map(|(i, attachment)| {

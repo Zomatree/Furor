@@ -10,14 +10,14 @@ pub mod pages;
 pub mod utils;
 pub mod state;
 pub mod types;
+pub mod websocket;
 
 pub mod prelude {
     pub use crate::utils::*;
-
     pub use crate::types;
-    pub use crate::state::{CHANNELS, MESSAGES, SERVERS, SERVER_MEMBERS, USERS};
+    pub use crate::state::*;
     pub use crate::http::HTTPClient;
-    pub use crate::{API_URL, AUTUMN_URL};
+    pub use crate::*;
     pub use crate::components;
 }
 

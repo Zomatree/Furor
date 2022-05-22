@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::{types::ulid::ULID, AUTUMN_URL};
+use crate::{types::ulid::ULID, AUTUMN_URL, API_URL};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -49,15 +49,34 @@ pub struct Asset {
     pub size: u64,
     pub filename: String,
     pub metadata: AssetMetadata,
-    pub content_type: String
+    pub content_type: String,
+
+    #[serde(default)]
+    pub default: bool,  // hacky solution to reuse this for default avatars as well
 }
 
 impl Asset {
     pub fn url(&self) -> String {
-        format!("https://{}/{}/{}/{}", AUTUMN_URL, self.tag, self.id, self.filename)
+        if self.default {
+            format!("{API_URL}/users/{}/default_avatar", self.id)
+        } else {
+            format!("https://{AUTUMN_URL}/{}/{}/{}", self.tag, self.id, self.filename)
+        }
     }
 
-    pub fn width_height(&self) -> (Option<u64>, Option<u64>) {
+    pub fn as_default_avatar(user_id: ULID) -> Self {
+        Self {
+            id: user_id,
+            tag: AssetType::Avatars,
+            size: 0,
+            filename: String::new(),
+            metadata: AssetMetadata::File {  },
+            content_type: String::new(),
+            default: true
+        }
+    }
+
+    pub fn resolution(&self) -> (Option<u64>, Option<u64>) {
         match self.metadata {
             AssetMetadata::File {  } => (None, None),
             AssetMetadata::Text {  } => (None, None),

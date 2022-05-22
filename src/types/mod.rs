@@ -19,5 +19,5 @@ pub use channel::*;
 pub use role::*;
 pub use permissions::*;
 pub use member::*;
-pub use ulid::*;
+pub use self::ulid::*;
 pub use http::*;

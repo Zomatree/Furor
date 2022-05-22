@@ -1,4 +1,6 @@
 use serde::{Deserialize, Serialize};
+use ulid::{Ulid};
+use chrono::{DateTime, Utc};
 
 #[derive(Clone, Eq)]
 pub struct ULID(pub String);
@@ -9,6 +11,12 @@ impl<'de> Deserialize<'de> for ULID {
         D: serde::Deserializer<'de> {
         String::deserialize(deserializer)
             .map(ULID)
+    }
+}
+
+impl ULID {
+    pub fn timestamp(&self) -> DateTime<Utc> {
+        Ulid::from_string(&self.0).unwrap().datetime()
     }
 }
 

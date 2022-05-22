@@ -26,6 +26,8 @@ pub fn get_username_avatar(
                         .get(&user.id)
                         .unwrap();
 
+                    let default_avatar = types::Asset::as_default_avatar(user.id.clone());
+
                     (
                         member
                             .nickname
@@ -35,7 +37,7 @@ pub fn get_username_avatar(
                             .avatar
                             .as_ref()
                             .or(user.avatar.as_ref())
-                            .unwrap()
+                            .unwrap_or(&default_avatar)
                             .url(),
                     )
                 }

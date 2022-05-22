@@ -2,13 +2,13 @@ use dioxus::prelude::*;
 use crate::prelude::*;
 
 #[derive(Props, PartialEq, Clone)]
-pub struct ReplyProps<'a> {
-    pub message_id: &'a types::ULID,
-    pub channel_id: &'a types::ULID,
-    pub message_mentions: &'a Vec<types::ULID>,
+pub struct ReplyProps {
+    pub message_id: types::ULID,
+    pub channel_id: types::ULID,
+    pub message_mentions: Vec<types::ULID>,
 }
 
-pub fn Reply<'a>(cx: Scope<'a, ReplyProps<'a>>) -> Element<'a> {
+pub fn Reply(cx: Scope<ReplyProps>) -> Element {
     let http = cx.consume_context::<HTTPClient>().unwrap();
 
     let message_cache = use_read(&cx, MESSAGES);
@@ -46,7 +46,7 @@ pub fn Reply<'a>(cx: Scope<'a, ReplyProps<'a>>) -> Element<'a> {
     cx.render(match reply.get() {
         Some(message) => {
             let message_id = &message.id;
-            let (username, avatar) = get_username_avatar(&cx, user_cache.get(&message.author).unwrap(), &message.masquerade, cx.props.channel_id);
+            let (username, avatar) = get_username_avatar(&cx, user_cache.get(&message.author).unwrap(), &message.masquerade, &cx.props.channel_id);
             let content = message.content.clone().unwrap_or_default();
 
             let username = if cx.props.message_mentions.contains(&message.author) {

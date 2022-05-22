@@ -120,6 +120,12 @@ pub struct MessageUpdateData {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct MessageAppendData {
+    #[serde(default)]
+    embeds: Option<Vec<Embed>>
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(tag = "type")]
 pub enum ReceiveWsMessage {
     Authenticated {},
@@ -147,6 +153,11 @@ pub enum ReceiveWsMessage {
     MessageDelete {
         #[serde(rename="id")] message_id: ULID,
         #[serde(rename="channel")] channel_id: String
+    },
+    MessageAppend {
+        #[serde(rename="id")] message_id: ULID,
+        #[serde(rename="channel")] channel_id: ULID,
+        append: MessageAppendData
     },
     ChannelCreate {
         #[serde(flatten)]
