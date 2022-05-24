@@ -15,13 +15,23 @@ pub enum BandcampContentType {
     Track
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum LightspeedType {
+    Channel,
+}
+
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(tag = "type")]
 pub enum SpecialEmbed {
-    None {},
+    None,
+    GIF,
     Youtube {
         id: String,
         timestamp: Option<String>
+    },
+    Lightspeed {
+        content_type: LightspeedType,
+        id: String
     },
     Twitch {
         content_type: TwitchContentType,
@@ -31,7 +41,7 @@ pub enum SpecialEmbed {
         content_type: String,
         id: String
     },
-    Soundcloud {},
+    Soundcloud,
     Bandcamp {
         content_type: BandcampContentType,
         id: String
@@ -60,19 +70,67 @@ pub struct Video {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+pub struct Text {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub icon_url: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub url: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub media: Option<Asset>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub colour: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Metadata {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    url: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    original_url: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    special: Option<SpecialEmbed>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    title: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    image: Option<Image>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    video: Option<Video>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    site_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    icon_url: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    colour: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(tag = "type")]
 pub enum Embed {
-    Website {
-        url: Option<String>,
-        special: Option<SpecialEmbed>,
-        title: Option<String>,
-        description: Option<String>,
-        image: Option<Image>,
-        video: Option<Video>,
-        site_name: Option<String>,
-        icon_url: Option<String>,
-        colour: Option<String>
-    }
+    Website(Metadata),
+    Image(Image),
+    Video(Video),
+    Text(Text),
+    None
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -85,12 +143,6 @@ pub struct Reply {
 pub struct Masquerade {
     pub name: Option<String>,
     pub avatar: Option<String>
-}
-
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct MessageEdited {
-    #[serde(rename = "$date")]
-    pub date: String
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -122,8 +174,14 @@ pub struct Message {
 
 impl Message {
     pub fn update(&mut self, data: MessageUpdateData) {
-        if let Some(new_content) = data.content {
-            self.content = Some(new_content)
+        if let Some(content) = data.content {
+            self.content = Some(content)
         }
+
+        if let Some(embeds) = data.embeds {
+            self.embeds = embeds
+        }
+
+        self.edited = Some(data.edited)
     }
 }

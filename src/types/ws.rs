@@ -11,7 +11,7 @@ use crate::types::{
     member::MemberId
 };
 
-use super::{role::Role, user::UserStatus, message::MessageEdited, ulid::ULID};
+use super::{role::Role, user::UserStatus, ulid::ULID};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(tag = "type")]
@@ -114,7 +114,7 @@ pub enum UserUpdateClear {
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct MessageUpdateData {
-    pub edited: MessageEdited,
+    pub edited: String,
     pub content: Option<String>,
     pub embeds: Option<Vec<Embed>>
 }

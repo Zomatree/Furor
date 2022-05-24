@@ -1,12 +1,13 @@
 use dioxus::prelude::*;
 use futures::{SinkExt, StreamExt, join};
-use std::{time::Duration};
+use std::{time::Duration, sync::atomic::{Ordering, AtomicBool}};
 use ws_stream_wasm::{WsMessage, WsMeta};
 use crate::prelude::*;
-use std::sync::Arc;
+use std::rc::Rc;
 use async_std::{sync::Mutex, task::sleep};
 use im_rc::HashMap;
 
+#[allow(clippy::too_many_arguments)]
 pub async fn websocket(
     http: HTTPClient,
     mut user_state: UserCache,
@@ -27,14 +28,23 @@ pub async fn websocket(
         .await
         .unwrap();
 
-    let ws = Arc::new(Mutex::new(ws));
+    let ws = Rc::new(Mutex::new(ws));
 
     let bg_ws = ws.clone();
 
+    let is_ready = Rc::new(AtomicBool::new(false));
+    let is_ready_bg = is_ready.clone();
+
     join!(async move {
         loop {
-            bg_ws.lock().await.send(WsMessage::Text(serde_json::to_string(&types::SendWsMessage::Ping { data: 0 }).unwrap())).await.unwrap();
-            sleep(Duration::from_secs(15)).await;
+            let ready = is_ready_bg.load(Ordering::Acquire);
+
+            if ready {
+                bg_ws.lock().await.send(WsMessage::Text(serde_json::to_string(&types::SendWsMessage::Ping { data: 0 }).unwrap())).await.unwrap();
+                sleep(Duration::from_secs(30)).await;
+            } else {
+                sleep(Duration::from_secs(1)).await;
+            }
         }
     },
     async move {
@@ -52,6 +62,9 @@ pub async fn websocket(
 
             match serde_json::from_str::<types::ReceiveWsMessage>(&payload) {
                 Ok(event) => match event {
+                    types::ReceiveWsMessage::Authenticated {} => {
+                        is_ready.store(true, Ordering::SeqCst)
+                    }
                     types::ReceiveWsMessage::Ready {
                         users,
                         servers,
@@ -119,7 +132,8 @@ pub async fn websocket(
                     types::ReceiveWsMessage::MessageUpdate { message_id, channel_id, data } => {
                         if let Some(channel) = message_state.get_mut(&channel_id) {
                             if let Some(message) = channel.get_mut(&message_id) {
-                                message.update(data)
+                                message.update(data);
+                                set_message_state(message_state.clone())
                             }
                         }
                     }
