@@ -14,11 +14,11 @@ pub enum AssetType {
 impl std::fmt::Display for AssetType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AssetType::Attachments => "attachments",
-            AssetType::Avatars => "avatars",
-            AssetType::Backgrounds => "backgrounds",
-            AssetType::Banners => "banners",
-            AssetType::Icons => "icons",
+            Self::Attachments => "attachments",
+            Self::Avatars => "avatars",
+            Self::Backgrounds => "backgrounds",
+            Self::Banners => "banners",
+            Self::Icons => "icons",
 
         }.fmt(f)
     }
@@ -27,9 +27,9 @@ impl std::fmt::Display for AssetType {
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(tag = "type")]
 pub enum AssetMetadata {
-    File {},
-    Text {},
-    Audio {},
+    File,
+    Text,
+    Audio,
     Image {
         width: u64,
         height: u64

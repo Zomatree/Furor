@@ -57,8 +57,7 @@ impl Token {
 
     pub fn inner(&self) -> String {
         match self {
-            Token::User(token) => token.clone(),
-            Token::Bot(token) => token.clone(),
+            Self::User(token) | Self::Bot(token) => token.clone(),
         }
     }
 }

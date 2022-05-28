@@ -19,3 +19,5 @@ pub static CHANNELS: Atom<ChannelCache> = |_| HashMap::new();
 pub static SERVER_MEMBERS: Atom<ServerMemberCache> = |_| HashMap::new();
 pub static MESSAGES: Atom<MessageCache> = |_| HashMap::new();
 pub static TYPING: Atom<TypingCache> = |_| HashMap::new();
+pub static CURRENT_SERVER: Atom<Option<types::ULID>> = |_| None;
+pub static CURRENT_CHANNEL: Atom<Option<types::ULID>> = |_| None;

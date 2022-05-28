@@ -175,13 +175,13 @@ pub struct Message {
 impl Message {
     pub fn update(&mut self, data: MessageUpdateData) {
         if let Some(content) = data.content {
-            self.content = Some(content)
+            self.content = Some(content);
         }
 
         if let Some(embeds) = data.embeds {
-            self.embeds = embeds
+            self.embeds = embeds;
         }
 
-        self.edited = Some(data.edited)
+        self.edited = Some(data.edited);
     }
 }

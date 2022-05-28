@@ -56,28 +56,27 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                     span {
                         style: "gap: 8px; display: flex; align-items: center",
                         span { "{username}" },
-                        {user.bot.is_some().then(|| rsx! {
+                        user.bot.is_some().then(|| rsx! {
                             span {
                                 "[BOT]"
                             }
-                        })}
-                    },
-                    span {
-                        "{content}",
+                        }),
                         edited.is_some().then(|| rsx! {
-                            " (edited)"
+                            span {
+                                style: "font-size: 10px",
+                                "(edited)"
+                            }
                         })
-                    }
+                    },
+                    span { "{content}" }
                 },
             }
-            attachments.iter().enumerate().map(|(i, attachment)| {
-                let url = attachment.url();
-
+            attachments.iter().cloned().enumerate().map(|(i, asset)| {
                 rsx! {
                     div {
                         key: "{i}",
-                        img {
-                            src: "{url}",
+                        components::Attachment {
+                            asset: asset
                         }
                     }
                 }

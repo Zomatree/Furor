@@ -39,14 +39,14 @@ pub fn Reply(cx: Scope<ReplyProps>) -> Element {
             };
 
             set_message_cache(message_cache);
-            reply.set(Some(message))
+            reply.set(Some(message));
         }
     }));
 
     cx.render(match reply.get() {
         Some(message) => {
             let message_id = &message.id;
-            let (username, avatar) = get_username_avatar(&cx, user_cache.get(&message.author).unwrap(), &message.masquerade, &cx.props.channel_id);
+            let (username, avatar) = get_username_avatar(&cx, &user_cache[&message.author], &message.masquerade, &cx.props.channel_id);
             let content = message.content.clone().unwrap_or_default();
 
             let username = if cx.props.message_mentions.contains(&message.author) {

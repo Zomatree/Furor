@@ -21,7 +21,7 @@ impl HTTPClient {
             .build()
             .unwrap();
 
-        HTTPClient { token, client, base_url, revolt_config }
+        Self { token, client, base_url, revolt_config }
     }
 
     fn post<T: Into<String>>(&self, route: T) -> RequestBuilder {

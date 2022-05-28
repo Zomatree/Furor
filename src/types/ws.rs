@@ -128,7 +128,7 @@ pub struct MessageAppendData {
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(tag = "type")]
 pub enum ReceiveWsMessage {
-    Authenticated {},
+    Authenticated,
     Error {
         error: String
     },

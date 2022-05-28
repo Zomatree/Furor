@@ -68,10 +68,10 @@ pub struct User {
     pub bot: Option<Bot>
 }
 
-fn no_relation() -> RelationStatus {
+const fn no_relation() -> RelationStatus {
     RelationStatus::None
 }
 
-fn offline_presence() -> UserPresence {
+const fn offline_presence() -> UserPresence {
     UserPresence::Offline
 }

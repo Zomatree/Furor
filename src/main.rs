@@ -4,8 +4,8 @@
 #![allow(non_snake_case)]
 
 pub mod http;
-pub mod components;
 pub mod pages;
+pub mod components;
 #[macro_use]
 pub mod utils;
 pub mod state;
@@ -13,12 +13,12 @@ pub mod types;
 pub mod websocket;
 
 pub mod prelude {
-    pub use crate::utils::*;
-    pub use crate::types;
-    pub use crate::state::*;
-    pub use crate::http::HTTPClient;
     pub use crate::*;
+    pub use crate::types;
+    pub use crate::utils::*;
+    pub use crate::state::*;
     pub use crate::components;
+    pub use crate::http::HTTPClient;
 }
 
 pub const API_URL: &str = "https://api.revolt.chat";

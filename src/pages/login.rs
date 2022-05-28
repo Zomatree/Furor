@@ -58,7 +58,7 @@ pub fn Login(cx: Scope<LoginProps>) -> Element {
                         style: "width: 30%; height: 48px; margin-top: 12px",
                         name: "token_type",
                         onchange: |evt| {
-                            token_type.set(evt.value.clone())
+                            token_type.set(evt.value.clone());
                         },
                         option {
                             value: "user",
@@ -72,7 +72,7 @@ pub fn Login(cx: Scope<LoginProps>) -> Element {
                     button {
                         style: "width: 8%; height: 48px; margin-top: 12px",
                         onclick: |_| {
-                            button_clicked.set(true)
+                            button_clicked.set(true);
                         },
                         "Done",
                     }

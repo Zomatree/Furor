@@ -1,10 +1,10 @@
 use dioxus::prelude::*;
-use futures::{SinkExt, StreamExt, join};
-use std::{time::Duration, sync::atomic::{Ordering, AtomicBool}};
+use futures::{SinkExt, StreamExt, join, channel::oneshot};
+use std::time::Duration;
 use ws_stream_wasm::{WsMessage, WsMeta};
 use crate::prelude::*;
 use std::rc::Rc;
-use async_std::{sync::Mutex, task::sleep};
+use async_std::{sync::RwLock, task::sleep};
 use im_rc::HashMap;
 
 #[allow(clippy::too_many_arguments)]
@@ -28,27 +28,22 @@ pub async fn websocket(
         .await
         .unwrap();
 
-    let ws = Rc::new(Mutex::new(ws));
+    let ws = Rc::new(RwLock::new(ws));
 
     let bg_ws = ws.clone();
 
-    let is_ready = Rc::new(AtomicBool::new(false));
-    let is_ready_bg = is_ready.clone();
+    let (ready_tx, ready_rx) = oneshot::channel();
 
     join!(async move {
-        loop {
-            let ready = is_ready_bg.load(Ordering::Acquire);
+        ready_rx.await.unwrap();
 
-            if ready {
-                bg_ws.lock().await.send(WsMessage::Text(serde_json::to_string(&types::SendWsMessage::Ping { data: 0 }).unwrap())).await.unwrap();
-                sleep(Duration::from_secs(30)).await;
-            } else {
-                sleep(Duration::from_secs(1)).await;
-            }
+        loop {
+            bg_ws.write().await.send(WsMessage::Text(serde_json::to_string(&types::SendWsMessage::Ping { data: 0 }).unwrap())).await.unwrap();
+            sleep(Duration::from_secs(30)).await;
         }
     },
     async move {
-        ws.lock().await.send(WsMessage::Text(
+        ws.write().await.send(WsMessage::Text(
             serde_json::to_string(&types::SendWsMessage::Authenticate {
                 token: http.token.inner().to_string(),
             })
@@ -57,13 +52,15 @@ pub async fn websocket(
         .await
         .unwrap();
 
-        while let Some(WsMessage::Text(payload)) = ws.lock().await.next().await {
+        let mut ready_tx = Some(ready_tx);
+
+        while let Some(WsMessage::Text(payload)) = ws.write().await.next().await {
             log::debug!("EVENT RECEIVED {payload}");
 
             match serde_json::from_str::<types::ReceiveWsMessage>(&payload) {
                 Ok(event) => match event {
-                    types::ReceiveWsMessage::Authenticated {} => {
-                        is_ready.store(true, Ordering::SeqCst)
+                    types::ReceiveWsMessage::Authenticated => {
+                        ready_tx.take().unwrap().send(()).unwrap();
                     }
                     types::ReceiveWsMessage::Ready {
                         users,
@@ -133,12 +130,12 @@ pub async fn websocket(
                         if let Some(channel) = message_state.get_mut(&channel_id) {
                             if let Some(message) = channel.get_mut(&message_id) {
                                 message.update(data);
-                                set_message_state(message_state.clone())
+                                set_message_state(message_state.clone());
                             }
                         }
                     }
                     _ => {
-                        log::info!("IGNORED EVENT: {event:?}")
+                        log::info!("IGNORED EVENT: {event:?}");
                     }
                 },
                 Err(error) => log::error!("{error:?}\n{payload}"),
