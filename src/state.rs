@@ -28,3 +28,4 @@ pub static REVOLT_CONFIG: Atom<Option<types::RevoltConfig>> = |_| None;
 pub static HTTP: Atom<Option<HTTPClient>> = |_| None;
 
 pub static USER: Atom<Option<(types::Token, types::ULID)>> = |_| None;
+pub static READY: Atom<bool> = |_| false;

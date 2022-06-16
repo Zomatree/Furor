@@ -6,7 +6,9 @@ pub fn App(cx: Scope) -> Element {
     let set_user = use_set(&cx, USER);
 
     cx.use_hook(|_| {
-        set_user(LocalStorage::get::<(types::Token, types::ULID)>("user").ok());
+        let user = LocalStorage::get::<(types::Token, types::ULID)>("user").ok();
+        log::info!("{user:?}");
+        set_user(user);
     });
 
     let user_state = use_read(&cx, USERS);
@@ -29,7 +31,12 @@ pub fn App(cx: Scope) -> Element {
 
     let set_http = use_set(&cx, HTTP);
     let user = use_read(&cx, USER);
+
     let revolt_config = use_read(&cx, REVOLT_CONFIG);
+    let set_config = use_set(&cx, REVOLT_CONFIG);
+
+    let ready = use_read(&cx, READY);
+    let set_ready = use_set(&cx, READY);
 
     log::info!("{user:?} {revolt_config:?}");
 
@@ -48,7 +55,8 @@ pub fn App(cx: Scope) -> Element {
             message_state,
             set_message_state,
             typing_state,
-            set_typing_state
+            set_typing_state,
+            set_ready
         ];
 
         let http = HTTPClient::new(token.clone(), user_id.clone(), API_URL, config.clone());
@@ -68,8 +76,25 @@ pub fn App(cx: Scope) -> Element {
                 message_state.clone(),
                 set_message_state.clone(),
                 typing_state.clone(),
-                set_typing_state.clone()
+                set_typing_state.clone(),
+                set_ready.clone()
             ).await;
+        })
+    } else if user.is_some() {
+        let set_config = set_config.clone();
+
+        cx.spawn(async move {
+            let client = reqwest::Client::new();
+
+            let res = client.get(API_URL)
+                .send()
+                .await
+                .unwrap()
+                .json::<types::RevoltConfig>()
+                .await
+                .unwrap();
+
+            set_config(Some(res));
         })
     };
 
@@ -78,13 +103,23 @@ pub fn App(cx: Scope) -> Element {
             to: "/login",
             pages::Login {}
         },
-        Route {
-            to: "/",
-            pages::Home {}
-        },
-        Route {
-            to: "/server/:server_id/:channel_id",
-            pages::Channel {}
+        if *ready {
+            rsx! {
+                Route {
+                to: "/",
+                pages::Home {}
+            },
+            Route {
+                to: "/server/:server_id/channel/:channel_id",
+                pages::Channel {}
+            }
+        }
+        } else {
+            rsx! {
+                div {
+                    "Loading..."
+                }
+            }
         }
     })
 }

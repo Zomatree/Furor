@@ -22,6 +22,7 @@ pub async fn websocket(
     set_message_state: FermiSetter<MessageCache>,
     mut typing_state: TypingCache,
     set_typing_state: FermiSetter<TypingCache>,
+    set_ready: FermiSetter<bool>
 ) {
     let (_, ws) = WsMeta::connect(http.revolt_config.ws.clone(), None)
         .await
@@ -35,6 +36,7 @@ pub async fn websocket(
 
     join!(async move {
         ready_rx.await.unwrap();
+        set_ready(true);
 
         loop {
             bg_ws.write().await.send(WsMessage::Text(serde_json::to_string(&types::SendWsMessage::Ping { data: 0 }).unwrap())).await.unwrap();
@@ -59,7 +61,7 @@ pub async fn websocket(
             match serde_json::from_str::<types::ReceiveWsMessage>(&payload) {
                 Ok(event) => match event {
                     types::ReceiveWsMessage::Authenticated => {
-                        ready_tx.take().unwrap().send(()).unwrap();
+
                     }
                     types::ReceiveWsMessage::Ready {
                         users,
@@ -101,6 +103,7 @@ pub async fn websocket(
 
                         set_user_state(user_state.clone());
                         set_server_member_state(server_member_state.clone());
+                        ready_tx.take().unwrap().send(()).unwrap();
                     },
                     types::ReceiveWsMessage::Message { message } => {
                         message_state

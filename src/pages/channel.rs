@@ -8,6 +8,7 @@ pub fn Channel(cx: Scope) -> Element {
 
     let server_id = route.parse_segment::<types::ULID>("server_id").unwrap().unwrap();
     let channel_id = route.parse_segment::<types::ULID>("channel_id").unwrap().unwrap();
+    log::info!("{server_id:?} {channel_id:?}");
 
     rsx!(cx, div {
         style: "width: 100%; height: 100%; display: flex; flex-direction: row",
