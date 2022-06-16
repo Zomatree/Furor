@@ -13,6 +13,10 @@ pub fn Typing<'a>(cx: Scope<'a, TypingProps<'a>>) -> Element<'a> {
 
     rsx!(cx, div {
         typing_state.get(cx.props.channel_id).map(|currently_typing| {
+            if currently_typing.is_empty() {
+                return rsx! { pre {} }
+            };
+
             let mut avatars = vec![];
             let mut names = vec![];
 
@@ -24,7 +28,19 @@ pub fn Typing<'a>(cx: Scope<'a, TypingProps<'a>>) -> Element<'a> {
                 avatars.push(avatar);
             };
 
-            let formatted_string = names.join(", ");
+            let formatted_string = match names.len() {
+                1 => {
+                    format!("{} is", names[0])
+                },
+                2 => {
+                    format!("{} and {} are", names[0], names[1])
+                },
+                _ => {
+                    let last = names.pop().unwrap();
+
+                    format!("{} and {} are", names.join(", "), last)
+                }
+            };
 
             rsx! {
                 div {
@@ -39,7 +55,7 @@ pub fn Typing<'a>(cx: Scope<'a, TypingProps<'a>>) -> Element<'a> {
                             }
                         }
                     }),
-                    "{formatted_string} are typing..."
+                    "{formatted_string} typing..."
                 }
             }
         })

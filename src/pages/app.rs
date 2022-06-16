@@ -1,42 +1,90 @@
-use dioxus::prelude::*;
-use crate::{pages::login::Login, prelude::*};
+use dioxus::{prelude::*, core::to_owned};
+use crate::{prelude::*, websocket::websocket};
+use gloo::storage::{LocalStorage, Storage};
 
-#[derive(Props, PartialEq)]
-pub struct AppProps {
-    pub api_url: String
-}
+pub fn App(cx: Scope) -> Element {
+    let set_user = use_set(&cx, USER);
 
-pub fn App(cx: Scope<AppProps>) -> Element {
-    let fut = use_future(&cx, (), |_| {
-        let api_url = cx.props.api_url.clone();
-
-        async move {
-            let client = reqwest::Client::new();
-            let res = client.get(api_url)
-                .send()
-                .await
-                .unwrap()
-                .json::<types::RevoltConfig>()
-                .await
-                .unwrap();
-            res
-        }
+    cx.use_hook(|_| {
+        set_user(LocalStorage::get::<(types::Token, types::ULID)>("user").ok());
     });
 
-    cx.render(match fut.value() {
-        Some(revolt_config) => {
-            rsx! {
-                Login {
-                    revolt_config: revolt_config.clone()
-                }
-            }
+    let user_state = use_read(&cx, USERS);
+    let set_user_state = use_set(&cx, USERS);
+
+    let server_state = use_read(&cx, SERVERS);
+    let set_server_state = use_set(&cx, SERVERS);
+
+    let channel_state = use_read(&cx, CHANNELS);
+    let set_channel_state = use_set(&cx, CHANNELS);
+
+    let server_member_state = use_read(&cx, SERVER_MEMBERS);
+    let set_server_member_state = use_set(&cx, SERVER_MEMBERS);
+
+    let message_state = use_read(&cx, MESSAGES);
+    let set_message_state = use_set(&cx, MESSAGES);
+
+    let typing_state = use_read(&cx, TYPING);
+    let set_typing_state = use_set(&cx, TYPING);
+
+    let set_http = use_set(&cx, HTTP);
+    let user = use_read(&cx, USER);
+    let revolt_config = use_read(&cx, REVOLT_CONFIG);
+
+    log::info!("{user:?} {revolt_config:?}");
+
+    if let Some((token, user_id)) = user && let Some(config) = revolt_config {
+        LocalStorage::set("user", (token.clone(), user_id.clone())).unwrap();
+
+        to_owned![
+            user_state,
+            set_user_state,
+            server_state,
+            set_server_state,
+            channel_state,
+            set_channel_state,
+            server_member_state,
+            set_server_member_state,
+            message_state,
+            set_message_state,
+            typing_state,
+            set_typing_state
+        ];
+
+        let http = HTTPClient::new(token.clone(), user_id.clone(), API_URL, config.clone());
+        set_http(Some(http.clone()));
+
+        cx.spawn(async move {
+            websocket(
+                http,
+                user_state.clone(),
+                set_user_state.clone(),
+                server_state.clone(),
+                set_server_state.clone(),
+                channel_state.clone(),
+                set_channel_state.clone(),
+                server_member_state.clone(),
+                set_server_member_state.clone(),
+                message_state.clone(),
+                set_message_state.clone(),
+                typing_state.clone(),
+                set_typing_state.clone()
+            ).await;
+        })
+    };
+
+    rsx!(cx, Router {
+        Route {
+            to: "/login",
+            pages::Login {}
         },
-        None => {
-            rsx! {
-                h1 {
-                    "Loading..."
-                }
-            }
+        Route {
+            to: "/",
+            pages::Home {}
+        },
+        Route {
+            to: "/server/:server_id/:channel_id",
+            pages::Channel {}
         }
     })
 }

@@ -22,7 +22,6 @@ pub async fn websocket(
     set_message_state: FermiSetter<MessageCache>,
     mut typing_state: TypingCache,
     set_typing_state: FermiSetter<TypingCache>,
-    ready: UseState<bool>,
 ) {
     let (_, ws) = WsMeta::connect(http.revolt_config.ws.clone(), None)
         .await
@@ -102,8 +101,6 @@ pub async fn websocket(
 
                         set_user_state(user_state.clone());
                         set_server_member_state(server_member_state.clone());
-
-                        ready.set(true);
                     },
                     types::ReceiveWsMessage::Message { message } => {
                         message_state

@@ -6,6 +6,8 @@ pub mod typing;
 pub mod message_area;
 pub mod server_list;
 pub mod channel_list;
+pub mod direct_message_list;
+pub mod hcaptcha;
 
 pub use message::Message;
 pub use reply::Reply;
@@ -15,3 +17,5 @@ pub use typing::Typing;
 pub use message_area::MessageArea;
 pub use server_list::ServerList;
 pub use channel_list::ChannelList;
+pub use direct_message_list::DirectMessageList;
+pub use hcaptcha::HCaptcha;

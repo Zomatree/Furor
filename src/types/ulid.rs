@@ -59,3 +59,11 @@ impl std::fmt::Debug for ULID {
         self.0.fmt(f)
     }
 }
+
+impl std::str::FromStr for ULID {
+    type Err = !;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Self(s.to_string()))
+    }
+}

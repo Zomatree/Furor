@@ -1,6 +1,7 @@
 #![feature(explicit_generic_args_with_impl_trait)]
 #![feature(async_closure)]
 #![feature(let_chains)]
+#![feature(never_type)]
 #![allow(non_snake_case)]
 
 pub mod http;
@@ -26,7 +27,5 @@ pub const AUTUMN_URL: &str = "autumn.revolt.chat";
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
-    dioxus::web::launch_with_props(pages::App, pages::app::AppProps {
-        api_url: String::from(API_URL)
-    }, |v| v);
+    dioxus::web::launch(pages::App);
 }

@@ -1,5 +1,7 @@
 use dioxus::core::ScopeState;
-use dioxus::fermi::use_read;
+use dioxus::prelude::*;
+use gloo::storage::{LocalStorage, Storage};
+use std::collections::HashMap;
 use crate::prelude::*;
 
 pub fn get_username_avatar(
@@ -99,5 +101,28 @@ impl MessageBuilder {
             replies: replies.unwrap_or_default(),
             masquerade
         }
+    }
+}
+
+pub fn get_last_channel(server_id: &types::ULID) -> Option<types::ULID> {
+    let last_channels = match LocalStorage::get::<HashMap<types::ULID, types::ULID>>("last_channels") {
+        Ok(channels) => channels,
+        Err(_) => {
+            LocalStorage::set("last_channels", HashMap::<types::ULID, types::ULID>::new()).unwrap();
+            HashMap::new()
+        }
+    };
+
+    last_channels
+        .get(server_id)
+        .cloned()
+}
+
+pub fn redirect_to_login(cx: &Scope) {
+    let router = use_router(cx);
+    let has_token = LocalStorage::get::<(types::Token, types::ULID)>("user").is_ok();
+
+    if !has_token {
+        router.push_route("/login", None, None)
     }
 }

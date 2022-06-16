@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-dioxus = { git="https://github.com/DioxusLabs/dioxus/", features = ["web", "macro", "hooks", "html", "fermi"] }
+dioxus = { git="https://github.com/DioxusLabs/dioxus/", features = ["web", "macro", "hooks", "html", "fermi", "router"] }
 async-std = { version = "1.0" }
 serde = { version = "1.0.133", features = ["derive"] }
 serde_json = "1.0.75"
@@ -18,4 +18,6 @@ ws_stream_wasm = "0.7.3"
 ulid = "0.5.0"
 chrono = { version = "0.4" }
 getrandom = { version = "0.2", features = ["js"] }
-
+gloo = "0.7.0"
+js-sys = "0.3.57"
+wasm-bindgen = "0.2.80"

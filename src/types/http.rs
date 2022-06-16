@@ -1,17 +1,8 @@
+use std::fmt;
+
 use serde::{Deserialize, Serialize};
 use crate::prelude::*;
 
-
-#[derive(Deserialize, Debug, Clone)]
-pub struct Login {
-    #[serde(rename="_id")]
-    pub id: types::ULID,
-
-    pub user_id: String,
-    pub token: String,
-    pub name: String,
-    pub subscription: String
-}
 
 #[derive(Deserialize, Serialize, Default)]
 pub struct SendMessage {
@@ -41,7 +32,7 @@ pub struct SendableEmbed {
 	pub colour: Option<String>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Token {
     User(String),
     Bot(String)
@@ -104,4 +95,72 @@ pub struct RevoltConfig {
     pub ws: String,
     pub app: String,
     pub vapid: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum MfaResponse {
+    Password(String),
+    RecoveryCode(String),
+    TotpCode(String)
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(untagged)]
+pub enum LoginBody {
+    Details {
+        email: String,
+        password: String,
+        captcha: Option<String>,
+        friendly_name: Option<String>
+    },
+    Mfa {
+        mfa_ticket: String,
+        mfa_response: MfaResponse,
+        friendly_name: Option<String>
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum MFAMethod {
+    Password,
+    Recovery,
+    Totp
+}
+
+impl fmt::Display for MFAMethod {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Password => "Password",
+            Self::Recovery => "Recovery Code",
+            Self::Totp => "Totp Code"
+        }.fmt(f)
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct WebPushSubscription {
+    pub endpoint: String,
+    pub p256dh: String,
+    pub auth: String
+
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(tag = "result")]
+pub enum Login {
+    Success {
+        #[serde(rename="_id")]
+        id: types::ULID,
+
+        user_id: String,
+        token: String,
+        name: String,
+        subscription: Option<WebPushSubscription>
+    },
+    #[serde(rename="MFA")]
+    Mfa {
+        ticket: String,
+        allowed_methods: Vec<MFAMethod>
+    }
 }

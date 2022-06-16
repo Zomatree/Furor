@@ -2,16 +2,16 @@ use dioxus::prelude::*;
 use crate::prelude::*;
 
 #[derive(Props, PartialEq)]
-pub struct ChannelProps<'a> {
-    channel_id: &'a types::ULID,
-    server_id: &'a types::ULID
+pub struct ChannelProps {
+    channel_id: types::ULID,
+    server_id: types::ULID
 }
 
-pub fn Channel<'a>(cx: Scope<'a, ChannelProps<'a>>) -> Element<'a> {
+pub fn Channel(cx: Scope<ChannelProps>) -> Element {
     let message_state = use_read(&cx, MESSAGES);
 
     let mut messages = message_state
-        .get(cx.props.channel_id)
+        .get(&cx.props.channel_id)
         .cloned()
         .unwrap_or_default()
         .values()
