@@ -81,21 +81,25 @@ pub enum Channel {
 impl Channel {
     pub fn id(&self) -> ULID {
         match self {
-            Channel::SavedMessages { id, .. } => id.clone(),
-            Channel::DirectMessage { id, .. } => id.clone(),
-            Channel::Group { id, .. } => id.clone(),
-            Channel::TextChannel { id, .. } => id.clone(),
-            Channel::VoiceChannel { id, .. } => id.clone(),
+            Self::SavedMessages { id, .. } => id.clone(),
+            Self::DirectMessage { id, .. } => id.clone(),
+            Self::Group { id, .. } => id.clone(),
+            Self::TextChannel { id, .. } => id.clone(),
+            Self::VoiceChannel { id, .. } => id.clone(),
         }
     }
 
     pub fn server(&self) -> Option<ULID> {
         match self {
-            Channel::SavedMessages { .. } => None,
-            Channel::DirectMessage { .. } => None,
-            Channel::Group { .. } => None,
-            Channel::TextChannel { server, ..} => Some(server.clone()),
-            Channel::VoiceChannel { server, .. } => Some(server.clone()),
+            Self::TextChannel { server, ..} | Self::VoiceChannel { server, .. } => Some(server.clone()),
+            _ => None
+        }
+    }
+
+    pub fn name(&self) -> Option<String> {
+        match self {
+            Self::TextChannel { name, .. } | Self::VoiceChannel { name, ..} | Self::Group { name, .. } => Some(name.clone()),
+            _ => None
         }
     }
 }

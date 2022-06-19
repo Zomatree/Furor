@@ -1,4 +1,3 @@
-use dioxus::prelude::*;
 use crate::prelude::*;
 
 pub fn ServerList(cx: Scope) -> Element {

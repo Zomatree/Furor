@@ -14,6 +14,7 @@ pub mod types;
 pub mod websocket;
 
 pub mod prelude {
+    pub use dioxus::prelude::*;
     pub use crate::*;
     pub use crate::types;
     pub use crate::utils::*;

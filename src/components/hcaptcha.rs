@@ -1,4 +1,3 @@
-use dioxus::prelude::*;
 use js_sys::{eval, global, Reflect};
 use wasm_bindgen::closure::Closure;
 use std::sync::Mutex;

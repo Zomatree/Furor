@@ -1,4 +1,3 @@
-use dioxus::prelude::*;
 use futures::{SinkExt, StreamExt, join, channel::oneshot};
 use std::time::Duration;
 use ws_stream_wasm::{WsMessage, WsMeta};

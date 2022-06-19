@@ -1,4 +1,3 @@
-use dioxus::prelude::*;
 use futures::StreamExt;
 use crate::prelude::*;
 
@@ -9,9 +8,9 @@ pub struct MessageAreaProps {
 
 pub fn MessageArea(cx: Scope<MessageAreaProps>) -> Element {
     let message = use_state(&cx, String::new);
+    let http = use_read(&cx, HTTP).clone().unwrap();
 
     let send_message = use_coroutine::<String, _, _>(&cx, move |mut rx| {
-        let http = cx.consume_context::<HTTPClient>().unwrap();
         let channel_id = cx.props.channel_id.clone();
 
         async move {
@@ -28,7 +27,7 @@ pub fn MessageArea(cx: Scope<MessageAreaProps>) -> Element {
     });
 
     rsx!(cx, div {
-        style: "height: 48px; background-color: blue; display: flex; flex-direction: row",
+        style: "min-height: 48px; background-color: blue; display: flex; flex-direction: row",
         input {
             style: "width: 90%",
             oninput: move |evt| {

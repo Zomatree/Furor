@@ -1,4 +1,3 @@
-use dioxus::prelude::*;
 use crate::prelude::*;
 
 #[derive(Props, PartialEq, Clone)]
@@ -9,7 +8,7 @@ pub struct ReplyProps {
 }
 
 pub fn Reply(cx: Scope<ReplyProps>) -> Element {
-    let http = cx.consume_context::<HTTPClient>().unwrap();
+    let http = use_read(&cx, HTTP).clone().unwrap();
 
     let message_cache = use_read(&cx, MESSAGES);
     let set_message_cache = use_set(&cx, MESSAGES);

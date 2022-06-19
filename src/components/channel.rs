@@ -1,4 +1,3 @@
-use dioxus::prelude::*;
 use crate::prelude::*;
 
 #[derive(Props, PartialEq)]
@@ -22,23 +21,20 @@ pub fn Channel(cx: Scope<ChannelProps>) -> Element {
 
     cx.render(rsx! {
         div {
-            style: "display: flex; flex-direction: column; width: 100%; flex-grow: 1",
-            div {
-                style: "background-color: grey; overflow-y: auto; flex-grow: 1",
-                messages.into_iter().map(|msg| {
-                    let message_id = msg.id.clone();
+            style: "display: flex; flex-direction: column; width: 100%; flex-grow: 1; background-color: grey; overflow-y: scroll",
+            messages.into_iter().map(|msg| {
+                let message_id = msg.id.clone();
 
-                    rsx! {
-                        div {
-                            key: "{message_id}",
-                            components::Message {
-                                channel_id: msg.channel,
-                                message_id: message_id.clone(),
-                            }
+                rsx! {
+                    div {
+                        key: "{message_id}",
+                        components::Message {
+                            channel_id: msg.channel,
+                            message_id: message_id.clone(),
                         }
                     }
-                })
-            }
+                }
+            })
         }
     })
 }

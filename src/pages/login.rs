@@ -1,4 +1,3 @@
-use dioxus::prelude::*;
 use crate::prelude::*;
 use std::sync::Mutex;
 
@@ -42,9 +41,10 @@ pub fn Login(cx: Scope) -> Element {
     let set_user = use_set(&cx, USER);
     let login_state = use_state(&cx, || LoginState::Details { email: String::new(), password: String::new() });
     let client = cx.use_hook(|_| reqwest::Client::new());
-    let captcha_token = use_state(&cx,  || None::<String>);
 
-    let button_text = login_state.get().button_text();
+    if get_local_storage_user().is_some() {
+        router.push_route("/", None, None)
+    }
 
     rsx!(cx, div {
         style: "display: flex; align-content: center",
@@ -228,7 +228,7 @@ pub fn Login(cx: Scope) -> Element {
                         }
                     }
                 },
-                "{button_text}"
+                [format_args!("{}", login_state.get().button_text())]
             }
         }
     })

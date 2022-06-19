@@ -164,3 +164,8 @@ pub enum Login {
         allowed_methods: Vec<MFAMethod>
     }
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct TooManyRequests {
+    pub retry_after: u64
+}

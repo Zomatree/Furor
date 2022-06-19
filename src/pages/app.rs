@@ -2,6 +2,21 @@ use dioxus::{prelude::*, core::to_owned};
 use crate::{prelude::*, websocket::websocket};
 use gloo::storage::{LocalStorage, Storage};
 
+macro_rules! loading_ready {
+    ($ready: ident, $page: path) => {
+        if *$ready {
+            rsx! {
+                $crate::$page {}
+            }
+        } else {
+            rsx! {
+                components::Loading {}
+            }
+        }
+    };
+}
+
+
 pub fn App(cx: Scope) -> Element {
     let set_user = use_set(&cx, USER);
 
@@ -29,7 +44,9 @@ pub fn App(cx: Scope) -> Element {
     let typing_state = use_read(&cx, TYPING);
     let set_typing_state = use_set(&cx, TYPING);
 
+    let http_state = use_read(&cx, HTTP);
     let set_http = use_set(&cx, HTTP);
+
     let user = use_read(&cx, USER);
 
     let revolt_config = use_read(&cx, REVOLT_CONFIG);
@@ -40,7 +57,7 @@ pub fn App(cx: Scope) -> Element {
 
     log::info!("{user:?} {revolt_config:?}");
 
-    if let Some((token, user_id)) = user && let Some(config) = revolt_config {
+    if let Some((token, user_id)) = user && let Some(config) = revolt_config && http_state.is_none() {
         LocalStorage::set("user", (token.clone(), user_id.clone())).unwrap();
 
         to_owned![
@@ -80,7 +97,7 @@ pub fn App(cx: Scope) -> Element {
                 set_ready.clone()
             ).await;
         })
-    } else if user.is_some() {
+    } else if user.is_some() && http_state.is_none() {
         let set_config = set_config.clone();
 
         cx.spawn(async move {
@@ -103,23 +120,15 @@ pub fn App(cx: Scope) -> Element {
             to: "/login",
             pages::Login {}
         },
-        if *ready {
-            rsx! {
-                Route {
-                to: "/",
-                pages::Home {}
-            },
+        rsx! {
             Route {
-                to: "/server/:server_id/channel/:channel_id",
-                pages::Channel {}
-            }
+            to: "/",
+            loading_ready!(ready, pages::Home)
+        },
+        Route {
+            to: "/server/:server_id/channel/:channel_id",
+            loading_ready!(ready, pages::Channel)
         }
-        } else {
-            rsx! {
-                div {
-                    "Loading..."
-                }
-            }
         }
     })
 }

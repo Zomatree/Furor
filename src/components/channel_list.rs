@@ -1,4 +1,3 @@
-use dioxus::prelude::*;
 use crate::prelude::*;
 
 #[derive(Props, PartialEq)]
@@ -10,6 +9,7 @@ pub fn ChannelList(cx: Scope<ChannelListProps>) -> Element {
     let server_state = use_read(&cx, SERVERS);
     let channel_state = use_read(&cx, CHANNELS);
     let set_channel = use_set(&cx, CURRENT_CHANNEL);
+    let router = use_router(&cx);
 
     rsx!(cx, div {
         style: "display: flex; flex-direction: column; width: 232px",
@@ -27,7 +27,8 @@ pub fn ChannelList(cx: Scope<ChannelListProps>) -> Element {
                                 key: "{cloned_id}",
                                 style: "display: flex; flex-direction: row",
                                 onclick: move |_| {
-                                    set_channel(Some(id.clone()))
+                                    set_channel(Some(id.clone()));
+                                    router.push_route(&format!("/server/{}/channel/{}", cx.props.server_id, id), None, None);
                                 },
                                 span {
                                     "# ",
