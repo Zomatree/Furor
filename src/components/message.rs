@@ -12,12 +12,13 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
         .get(&cx.props.channel_id)?
         .get(&cx.props.message_id)?;
 
-    let types::Message { content, author, attachments, channel, masquerade, replies, edited, .. } = message;
+    let types::Message { content, author, attachments, channel, masquerade, replies, edited, id, .. } = message;
 
     let user_cache = use_read(&cx, USERS);
     let user = user_cache.get(author).unwrap();
     let (username, avatar) = get_username_avatar(&cx, user, masquerade, channel);
     let content = content.clone().unwrap_or_default();
+    let created_at = cx.use_hook(|_| format_datetime(&id.timestamp()));  // only needs to be calculated once
 
     cx.render(rsx! {
         div {
@@ -60,6 +61,7 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                                 "[BOT]"
                             }
                         }),
+                        time { "{created_at}" },
                         edited.is_some().then(|| rsx! {
                             span {
                                 style: "font-size: 10px",

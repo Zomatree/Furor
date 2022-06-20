@@ -31,6 +31,10 @@ pub fn Channel(cx: Scope) -> Element {
                     channel_id: channel_id.clone(),
                     server_id: server_id.clone()
                 },
+                components::Typing {
+                    channel_id: channel_id.clone(),
+
+                }
                 components::MessageArea {
                     channel_id: channel_id
                 }

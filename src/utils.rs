@@ -129,3 +129,16 @@ pub fn redirect_to_login(cx: &Scope) {
         router.push_route("/login", None, None)
     }
 }
+
+pub fn format_datetime<Tz: chrono::TimeZone>(dt: &chrono::DateTime<Tz>) -> String where Tz::Offset: std::fmt::Display {
+    let now = chrono::Utc::now();
+    let yesterday = now - chrono::Duration::days(1);
+
+    if dt.date() == now.date() {
+        dt.format("Today at %H:%M").to_string()
+    } else if dt.date() == yesterday.date() {
+        dt.format("Yesterday at %H:%M").to_string()
+    } else {
+        dt.format("%d/%m/%Y").to_string()
+    }
+}
