@@ -28,6 +28,8 @@ pub fn ChannelList(cx: Scope<ChannelListProps>) -> Element {
                                 style: "display: flex; flex-direction: row",
                                 onclick: move |_| {
                                     set_channel(Some(id.clone()));
+                                    set_last_channel(cx.props.server_id.clone(), id.clone());
+
                                     router.push_route(&format!("/server/{}/channel/{}", cx.props.server_id, id), None, None);
                                 },
                                 span {

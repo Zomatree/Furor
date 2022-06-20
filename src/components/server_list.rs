@@ -5,6 +5,7 @@ pub fn ServerList(cx: Scope) -> Element {
     let set_current_channel = use_set(&cx, CURRENT_CHANNEL);
     let server_state = use_read(&cx, SERVERS);
     let channel_state = use_read(&cx, CHANNELS);
+    let router = use_router(&cx);
 
     rsx!(cx, div {
         style: "display: flex; width: 56px; min-width: 56px; flex-direction: column; justify-content: flex-start; overflow-y: auto; align-items: center",
@@ -15,14 +16,9 @@ pub fn ServerList(cx: Scope) -> Element {
             let key = id.clone();
 
             rsx! {
-                img {
+                button {
                     key: "{key}",
-                    src: "{icon}",
-                    height: "42",
-                    width: "42",
                     onclick: move |_| {
-                        let id = id.clone();
-
                         set_current_server(Some(id.clone()));
 
                         let channel = get_last_channel(&id).unwrap_or_else(|| {
@@ -34,7 +30,13 @@ pub fn ServerList(cx: Scope) -> Element {
                                 .id()
                         });
 
-                        set_current_channel(Some(channel));
+                        set_current_channel(Some(channel.clone()));
+                        router.push_route(&format!("/server/{id}/channel/{channel}"), None, None);
+                    },
+                    img {
+                        src: "{icon}",
+                        height: "42",
+                        width: "42"
                     }
                 }
             }
