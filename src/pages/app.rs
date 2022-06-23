@@ -44,6 +44,9 @@ pub fn App(cx: Scope) -> Element {
     let typing_state = use_read(&cx, TYPING);
     let set_typing_state = use_set(&cx, TYPING);
 
+    let dm_channel_state = use_read(&cx, DM_CHANNELS);
+    let set_dm_channel_state = use_set(&cx, DM_CHANNELS);
+
     let http_state = use_read(&cx, HTTP);
     let set_http = use_set(&cx, HTTP);
 
@@ -73,6 +76,8 @@ pub fn App(cx: Scope) -> Element {
             set_message_state,
             typing_state,
             set_typing_state,
+            dm_channel_state,
+            set_dm_channel_state,
             set_ready
         ];
 
@@ -94,6 +99,8 @@ pub fn App(cx: Scope) -> Element {
                 set_message_state.clone(),
                 typing_state.clone(),
                 set_typing_state.clone(),
+                dm_channel_state.clone(),
+                set_dm_channel_state.clone(),
                 set_ready.clone()
             ).await;
         })

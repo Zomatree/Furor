@@ -44,10 +44,35 @@ impl HTTPClient {
         Self { token, user_id, client, base_url, revolt_config: Arc::new(revolt_config), ratelimits: Arc::new(Mutex::new(HashMap::new())) }
     }
 
+    #[inline]
     fn build<T: AsRef<str>>(&self, method: Method, route: T) -> RequestBuilder {
         self.client.request(method, format!("{}{}", self.base_url, route.as_ref()))
     }
 
+    #[inline]
+    fn get<T: AsRef<str>>(&self, route: T) -> RequestBuilder {
+        self.build(Method::GET, route)
+    }
+
+    #[inline]
+    fn post<T: AsRef<str>>(&self, route: T) -> RequestBuilder {
+        self.build(Method::POST, route)
+    }
+
+    #[inline]
+    fn delete<T: AsRef<str>>(&self, route: T) -> RequestBuilder {
+        self.build(Method::DELETE, route)
+    }
+
+    #[inline]
+    fn patch<T: AsRef<str>>(&self, route: T) -> RequestBuilder {
+        self.build(Method::PATCH, route)
+    }
+
+    #[inline]
+    fn put<T: AsRef<str>>(&self, route: T) -> RequestBuilder {
+        self.build(Method::PUT, route)
+    }
 
     #[async_recursion(?Send)]
     async fn send(&self, builder: RequestBuilder) -> Result<Response, ReqwestError> {
@@ -98,7 +123,7 @@ impl HTTPClient {
 
     pub async fn send_message(&self, channel_id: &types::ULID, message: types::SendMessage) -> types::Message {
         self.send(
-            self.build(Method::POST, format!("/channels/{channel_id}/messages"))
+            self.post(format!("/channels/{channel_id}/messages"))
             .json(&message)
         )
             .await
@@ -110,7 +135,7 @@ impl HTTPClient {
 
     pub async fn fetch_server_members(&self, server_id: &types::ULID) -> types::ServerMembers {
         self.send(
-            self.build(Method::GET, format!("/servers/{server_id}/members"))
+            self.get(format!("/servers/{server_id}/members"))
         )
             .await
             .unwrap()
@@ -121,7 +146,18 @@ impl HTTPClient {
 
     pub async fn fetch_message(&self, channel_id: &types::ULID, message_id: &types::ULID) -> types::Message {
         self.send(
-            self.build(Method::GET, format!("/channels/{channel_id}/messages/{message_id}"))
+            self.get(format!("/channels/{channel_id}/messages/{message_id}"))
+        )
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap()
+    }
+
+    pub async fn fetch_dm_channels(&self) -> Vec<types::Channel> {
+        self.send(
+            self.get("/users/dms")
         )
             .await
             .unwrap()

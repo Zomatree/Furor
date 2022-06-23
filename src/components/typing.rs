@@ -8,6 +8,8 @@ pub struct TypingProps {
 pub fn Typing(cx: Scope<TypingProps>) -> Element {
     let typing_state = use_read(&cx, TYPING);
     let user_state = use_read(&cx, USERS);
+    let server_member_state = use_read(&cx, SERVER_MEMBERS);
+    let channel_state = use_read(&cx, CHANNELS);
 
     rsx!(cx, div {
         typing_state.get(&cx.props.channel_id).map(|currently_typing| {
@@ -20,7 +22,7 @@ pub fn Typing(cx: Scope<TypingProps>) -> Element {
 
             for user_id in currently_typing {
                 let user = &user_state[user_id];
-                let (username, avatar) = get_username_avatar(&cx, user, &None, &cx.props.channel_id);
+                let (username, avatar) = get_username_avatar(channel_state, server_member_state, user, &None, Some(&cx.props.channel_id));
 
                 names.push(username);
                 avatars.push(avatar);

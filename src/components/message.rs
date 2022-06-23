@@ -7,16 +7,19 @@ pub struct MessageProps {
 }
 
 pub fn Message(cx: Scope<MessageProps>) -> Element {
-    let message_cache = use_read(&cx, MESSAGES);
-    let message = message_cache
+    let message_state = use_read(&cx, MESSAGES);
+    let channel_state = use_read(&cx, CHANNELS);
+    let server_members = use_read(&cx, SERVER_MEMBERS);
+
+    let message = message_state
         .get(&cx.props.channel_id)?
         .get(&cx.props.message_id)?;
 
     let types::Message { content, author, attachments, channel, masquerade, replies, edited, id, .. } = message;
 
-    let user_cache = use_read(&cx, USERS);
-    let user = user_cache.get(author).unwrap();
-    let (username, avatar) = get_username_avatar(&cx, user, masquerade, channel);
+    let user_state = use_read(&cx, USERS);
+    let user = user_state.get(author).unwrap();
+    let (username, avatar) = get_username_avatar(channel_state, server_members, user, masquerade, Some(channel));
     let content = content.clone().unwrap_or_default();
     let created_at = cx.use_hook(|_| format_datetime(&id.timestamp()));  // only needs to be calculated once
 

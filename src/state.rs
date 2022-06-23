@@ -4,21 +4,23 @@ use im_rc::{HashMap, HashSet};
 
 use crate::prelude::*;
 
-pub type UserCache = HashMap<types::ULID, types::User>;
-pub type ServerCache = HashMap<types::ULID, types::Server>;
-pub type ChannelCache = HashMap<types::ULID, types::Channel>;
-pub type ServerMemberCache =HashMap<types::ULID, HashMap<types::ULID, types::Member>>;
-pub type MessageCache = HashMap<types::ULID, HashMap<types::ULID, types::Message>>;
-pub type TypingCache = HashMap<types::ULID, HashSet<types::ULID>>;
+pub type UserState = HashMap<types::ULID, types::User>;
+pub type ServerState = HashMap<types::ULID, types::Server>;
+pub type ChannelState = HashMap<types::ULID, types::Channel>;
+pub type ServerMemberState =HashMap<types::ULID, HashMap<types::ULID, types::Member>>;
+pub type MessageState = HashMap<types::ULID, HashMap<types::ULID, types::Message>>;
+pub type TypingState = HashMap<types::ULID, HashSet<types::ULID>>;
+pub type DmChannelState = HashSet<types::ULID>;
 
 pub type FermiSetter<T> = Rc<dyn Fn(T)>;
 
-pub static USERS: Atom<UserCache> = |_| HashMap::new();
-pub static SERVERS: Atom<ServerCache> = |_| HashMap::new();
-pub static CHANNELS: Atom<ChannelCache> = |_| HashMap::new();
-pub static SERVER_MEMBERS: Atom<ServerMemberCache> = |_| HashMap::new();
-pub static MESSAGES: Atom<MessageCache> = |_| HashMap::new();
-pub static TYPING: Atom<TypingCache> = |_| HashMap::new();
+pub static USERS: Atom<UserState> = |_| HashMap::new();
+pub static SERVERS: Atom<ServerState> = |_| HashMap::new();
+pub static CHANNELS: Atom<ChannelState> = |_| HashMap::new();
+pub static SERVER_MEMBERS: Atom<ServerMemberState> = |_| HashMap::new();
+pub static MESSAGES: Atom<MessageState> = |_| HashMap::new();
+pub static TYPING: Atom<TypingState> = |_| HashMap::new();
+pub static DM_CHANNELS: Atom<DmChannelState> = |_| HashSet::new();
 
 pub static CURRENT_SERVER: Atom<Option<types::ULID>> = |_| None;
 pub static CURRENT_CHANNEL: Atom<Option<types::ULID>> = |_| None;

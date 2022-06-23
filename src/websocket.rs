@@ -9,18 +9,20 @@ use im_rc::HashMap;
 #[allow(clippy::too_many_arguments)]
 pub async fn websocket(
     http: HTTPClient,
-    mut user_state: UserCache,
-    set_user_state: FermiSetter<UserCache>,
-    mut server_state: ServerCache,
-    set_server_state: FermiSetter<ServerCache>,
-    mut channel_state: ChannelCache,
-    set_channel_state: FermiSetter<ChannelCache>,
-    mut server_member_state: ServerMemberCache,
-    set_server_member_state: FermiSetter<ServerMemberCache>,
-    mut message_state: MessageCache,
-    set_message_state: FermiSetter<MessageCache>,
-    mut typing_state: TypingCache,
-    set_typing_state: FermiSetter<TypingCache>,
+    mut user_state: UserState,
+    set_user_state: FermiSetter<UserState>,
+    mut server_state: ServerState,
+    set_server_state: FermiSetter<ServerState>,
+    mut channel_state: ChannelState,
+    set_channel_state: FermiSetter<ChannelState>,
+    mut server_member_state: ServerMemberState,
+    set_server_member_state: FermiSetter<ServerMemberState>,
+    mut message_state: MessageState,
+    set_message_state: FermiSetter<MessageState>,
+    mut typing_state: TypingState,
+    set_typing_state: FermiSetter<TypingState>,
+    mut dm_channel_state: DmChannelState,
+    set_dm_channel_state: FermiSetter<DmChannelState>,
     set_ready: FermiSetter<bool>
 ) {
     let (_, ws) = WsMeta::connect(http.revolt_config.ws.clone(), None)
@@ -102,6 +104,15 @@ pub async fn websocket(
 
                         set_user_state(user_state.clone());
                         set_server_member_state(server_member_state.clone());
+
+                        let dm_channels = http.fetch_dm_channels().await;
+
+                        for dm_channel in dm_channels {
+                            dm_channel_state.insert(dm_channel.id());
+                        };
+
+                        set_dm_channel_state(dm_channel_state.clone());
+
                         ready_tx.take().unwrap().send(()).unwrap();
                     },
                     types::ReceiveWsMessage::Message { message } => {

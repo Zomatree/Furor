@@ -19,34 +19,34 @@ pub fn ChannelList(cx: Scope<ChannelListProps>) -> Element {
             .filter_map(|channel_id| channel_state.get(channel_id).cloned())
             .map(|channel| {
                 match channel {
-                    types::Channel::TextChannel { id, name, .. } => {
-                        let cloned_id = id.clone();
+                    types::Channel::TextChannel(channel) => {
+                        let cloned_id = channel.id.clone();
 
                         rsx! {
                             button {
                                 key: "{cloned_id}",
                                 style: "display: flex; flex-direction: row",
                                 onclick: move |_| {
-                                    set_channel(Some(id.clone()));
-                                    set_last_channel(cx.props.server_id.clone(), id.clone());
+                                    set_channel(Some(channel.id.clone()));
+                                    set_last_channel(cx.props.server_id.clone(), channel.id.clone());
 
-                                    router.push_route(&format!("/server/{}/channel/{}", cx.props.server_id, id), None, None);
+                                    router.push_route(&format!("/server/{}/channel/{}", cx.props.server_id, channel.id), None, None);
                                 },
                                 span {
                                     "# ",
-                                    "{name}"
+                                    "{channel.name}"
                                 },
                             }
                         }
                     },
-                    types::Channel::VoiceChannel { id, name, .. } => {
+                    types::Channel::VoiceChannel(channel) => {
                         rsx! {
                             button {
-                                key: "{id}",
+                                key: "{channel.id}",
                                 style: "display: flex; flex-direction: row",
                                 span {
                                     "V ",
-                                    "{name}"
+                                    "{channel.name}"
                                 },
                             }
                         }

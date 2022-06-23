@@ -1,13 +1,13 @@
-use dioxus::core::ScopeState;
 use gloo::storage::{LocalStorage, Storage};
-use std::collections::HashMap;
+use im_rc::HashMap;
 use crate::prelude::*;
 
 pub fn get_username_avatar(
-    cx: &ScopeState,
+    channels: &ChannelState,
+    server_members: &ServerMemberState,
     user: &types::User,
     masquerade: &Option<types::Masquerade>,
-    channel_id: &types::ULID,
+    channel_id: Option<&types::ULID>,
 ) -> (String, String) {
     match masquerade {
         Some(mask) => (
@@ -17,17 +17,19 @@ pub fn get_username_avatar(
                 .unwrap_or_else(|| user.avatar.clone().unwrap().url()),
         ),
         None => {
-            let channel = use_read(cx, CHANNELS).get(channel_id).unwrap();
+            let server = channel_id
+                .and_then(|id| channels.get(id))
+                .and_then(|channel| channel.server());
 
-            match channel.server() {
+            let default_avatar = types::Asset::as_default_avatar(user.id.clone());
+
+            match server {
                 Some(server_id) => {
-                    let member = use_read(cx, SERVER_MEMBERS)
-                        .get(&server_id)
+                    let member = server_members.get(&server_id)
                         .unwrap()
                         .get(&user.id)
                         .unwrap();
 
-                    let default_avatar = types::Asset::as_default_avatar(user.id.clone());
 
                     (
                         member
@@ -44,7 +46,7 @@ pub fn get_username_avatar(
                 }
                 None => (
                     user.username.clone(),
-                    user.avatar.clone().unwrap().url(),
+                    user.avatar.clone().unwrap_or(default_avatar).url(),
                 ),
             }
         }

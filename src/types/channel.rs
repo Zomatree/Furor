@@ -7,98 +7,125 @@ use crate::types::{
 };
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct SavedMessages {
+    #[serde(rename = "_id")]
+    pub id: ULID,
+
+    pub user: String
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct DirectMessage {
+    #[serde(rename = "_id")]
+    pub id: ULID,
+
+    pub active: bool,
+    pub recipients: Vec<ULID>,
+    pub last_message_id: Option<ULID>
+}
+
+impl DirectMessage {
+    pub fn get_recipient(&self, current: &ULID) -> &ULID {
+        self.recipients
+            .iter()
+            .find(|&id| id != current)
+            .unwrap()
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct Group {
+    #[serde(rename = "_id")]
+    pub id: ULID,
+
+    pub recipients: Vec<String>,
+    pub name: String,
+    pub owner: String,
+    pub description: Option<String>,
+    pub last_message_id: Option<String>,
+    pub icon: Option<Asset>,
+    pub permissions: Option<u64>,
+
+    #[serde(default)]
+    pub nsfw: bool
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct TextChannel {
+    #[serde(rename = "_id")]
+    pub id: ULID,
+
+    pub server: ULID,
+    pub name: String,
+    pub description: Option<String>,
+    pub icon: Option<Asset>,
+
+    #[serde(default)]
+    pub default_permissions: PermissionsOverwrite,
+
+    #[serde(default)]
+    pub role_permissions: HashMap<ULID, PermissionsOverwrite>,
+
+    #[serde(default)]
+    pub nsfw: bool,
+
+    pub last_message_id: Option<String>
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub struct VoiceChannel {
+    #[serde(rename = "_id")]
+    pub id: ULID,
+
+    pub server: ULID,
+    pub name: String,
+    pub description: Option<String>,
+    pub icon: Option<Asset>,
+
+    #[serde(default)]
+    pub default_permissions: PermissionsOverwrite,
+
+    #[serde(default)]
+    pub role_permissions: HashMap<String, PermissionsOverwrite>,
+
+    #[serde(default)]
+    pub nsfw: bool,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(tag = "channel_type")]
 pub enum Channel {
-    SavedMessages {
-        #[serde(rename = "_id")]
-        id: ULID,
-
-        user: String
-    },
-    DirectMessage {
-        #[serde(rename = "_id")]
-        id: ULID,
-
-        active: bool,
-        recipients: Vec<String>,
-        last_message_id: Option<String>
-    },
-    Group {
-        #[serde(rename = "_id")]
-        id: ULID,
-
-        recipients: Vec<String>,
-        name: String,
-        owner: String,
-        description: Option<String>,
-        last_message_id: Option<String>,
-        icon: Option<Asset>,
-        permissions: Option<u64>,
-
-        #[serde(default)]
-        nsfw: bool
-    },
-    TextChannel {
-        #[serde(rename = "_id")]
-        id: ULID,
-
-        server: ULID,
-        name: String,
-        description: Option<String>,
-        icon: Option<Asset>,
-
-        #[serde(default)]
-        default_permissions: PermissionsOverwrite,
-
-        #[serde(default)]
-        role_permissions: HashMap<ULID, PermissionsOverwrite>,
-
-        #[serde(default)]
-        nsfw: bool,
-
-        last_message_id: Option<String>
-    },
-    VoiceChannel {
-        #[serde(rename = "_id")]
-        id: ULID,
-
-        server: ULID,
-        name: String,
-        description: Option<String>,
-        icon: Option<Asset>,
-
-        #[serde(default)]
-        default_permissions: PermissionsOverwrite,
-
-        #[serde(default)]
-        role_permissions: HashMap<String, PermissionsOverwrite>,
-
-        #[serde(default)]
-        nsfw: bool,
-    }
+    SavedMessages(SavedMessages),
+    DirectMessage(DirectMessage),
+    Group(Group),
+    TextChannel(TextChannel),
+    VoiceChannel(VoiceChannel)
 }
 
 impl Channel {
     pub fn id(&self) -> ULID {
         match self {
-            Self::SavedMessages { id, .. } => id.clone(),
-            Self::DirectMessage { id, .. } => id.clone(),
-            Self::Group { id, .. } => id.clone(),
-            Self::TextChannel { id, .. } => id.clone(),
-            Self::VoiceChannel { id, .. } => id.clone(),
+            Self::SavedMessages(c) => c.id.clone(),
+            Self::DirectMessage(c) => c.id.clone(),
+            Self::Group(c) => c.id.clone(),
+            Self::TextChannel(c) => c.id.clone(),
+            Self::VoiceChannel(c) => c.id.clone(),
         }
     }
 
     pub fn server(&self) -> Option<ULID> {
         match self {
-            Self::TextChannel { server, ..} | Self::VoiceChannel { server, .. } => Some(server.clone()),
+            Self::TextChannel(c) => Some(c.server.clone()),
+            Self::VoiceChannel(c) => Some(c.server.clone()),
             _ => None
         }
     }
 
     pub fn name(&self) -> Option<String> {
         match self {
-            Self::TextChannel { name, .. } | Self::VoiceChannel { name, ..} | Self::Group { name, .. } => Some(name.clone()),
+            Self::TextChannel(c) => Some(c.name.clone()),
+            Self::VoiceChannel(c) => Some(c.name.clone()),
+            Self::Group(c) => Some(c.name.clone()),
             _ => None
         }
     }

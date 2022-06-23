@@ -1,4 +1,3 @@
-use futures::StreamExt;
 use crate::prelude::*;
 
 #[derive(Props, PartialEq)]
@@ -9,22 +8,6 @@ pub struct MessageAreaProps {
 pub fn MessageArea(cx: Scope<MessageAreaProps>) -> Element {
     let message = use_state(&cx, String::new);
     let http = use_read(&cx, HTTP).clone().unwrap();
-
-    let send_message = use_coroutine::<String, _, _>(&cx, move |mut rx| {
-        let channel_id = cx.props.channel_id.clone();
-
-        async move {
-            while let Some(content) = rx.next().await {
-                http.send_message(
-                    &channel_id,
-                    MessageBuilder::new()
-                        .content(content)
-                        .build(),
-                )
-                .await;
-            }
-        }
-    });
 
     rsx!(cx, div {
         style: "min-height: 48px; background-color: blue; display: flex; flex-direction: row",
@@ -37,7 +20,15 @@ pub fn MessageArea(cx: Scope<MessageAreaProps>) -> Element {
         button {
             style: "width: 10%",
             onclick: move |_| {
-                send_message.send(message.get().clone());
+                let channel_id = cx.props.channel_id.clone();
+                let http = http.clone();
+                let content = message.get().clone();
+
+                cx.spawn(async move {
+                    http.send_message(
+                        &channel_id, MessageBuilder::new().content(content).build(),
+                    ).await;
+                })
             },
             "Send"
         }
