@@ -9,6 +9,7 @@ pub mod channel_list;
 pub mod direct_message_list;
 pub mod hcaptcha;
 pub mod loading;
+pub mod icon;
 
 pub use message::Message;
 pub use reply::Reply;
@@ -21,3 +22,4 @@ pub use channel_list::ChannelList;
 pub use direct_message_list::DirectMessageList;
 pub use hcaptcha::HCaptcha;
 pub use loading::Loading;
+pub use icon::Icon;

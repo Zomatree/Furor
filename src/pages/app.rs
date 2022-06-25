@@ -127,8 +127,7 @@ pub fn App(cx: Scope) -> Element {
             to: "/login",
             pages::Login {}
         },
-        rsx! {
-            Route {
+        Route {
             to: "/",
             loading_ready!(ready, pages::Home)
         },
@@ -136,6 +135,9 @@ pub fn App(cx: Scope) -> Element {
             to: "/server/:server_id/channel/:channel_id",
             loading_ready!(ready, pages::Channel)
         }
+        Route {
+            to: "/channe/:channel_id",
+            loading_ready!(ready, pages::DmChannel)
         }
     })
 }
