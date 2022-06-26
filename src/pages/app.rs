@@ -136,7 +136,7 @@ pub fn App(cx: Scope) -> Element {
             loading_ready!(ready, pages::Channel)
         }
         Route {
-            to: "/channe/:channel_id",
+            to: "/channel/:channel_id",
             loading_ready!(ready, pages::DmChannel)
         }
     })

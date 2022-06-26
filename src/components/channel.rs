@@ -2,39 +2,37 @@ use crate::prelude::*;
 
 #[derive(Props, PartialEq)]
 pub struct ChannelProps {
-    channel_id: types::ULID,
-    server_id: types::ULID
+    pub channel_id: types::ULID,
+
+    #[props(optional)]
+    pub name: Option<String>
 }
 
 pub fn Channel(cx: Scope<ChannelProps>) -> Element {
-    let message_state = use_read(&cx, MESSAGES);
+    let channels = use_read(&cx, CHANNELS);
 
-    let mut messages = message_state
-        .get(&cx.props.channel_id)
-        .cloned()
-        .unwrap_or_default()
-        .values()
-        .cloned()
-        .collect::<Vec<_>>();
-
-    messages.sort_by(|a, b| a.id.timestamp().cmp(&b.id.timestamp()));
+    let name = cx.props.name
+        .clone()
+        .or_else(|| channels[&cx.props.channel_id].name())
+        .unwrap();
 
     cx.render(rsx! {
         div {
-            style: "display: flex; flex-direction: column; width: 100%; flex-grow: 1; background-color: grey; overflow-y: scroll",
-            messages.into_iter().map(|msg| {
-                let message_id = msg.id.clone();
+            style: "display: flex; flex-direction: column; width: 100%",
+            div {
+                style: "height: 48px; width: 100%",
+                "{name}"
+            }
+            components::ChannelMessages {
+                channel_id: cx.props.channel_id.clone(),
+            },
+            components::Typing {
+                channel_id: cx.props.channel_id.clone(),
 
-                rsx! {
-                    div {
-                        key: "{message_id}",
-                        components::Message {
-                            channel_id: msg.channel,
-                            message_id: message_id.clone(),
-                        }
-                    }
-                }
-            })
+            }
+            components::MessageArea {
+                channel_id: cx.props.channel_id.clone(),
+            }
         }
     })
 }
