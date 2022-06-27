@@ -121,11 +121,12 @@ impl Channel {
         }
     }
 
-    pub fn name(&self) -> Option<String> {
+    pub fn name(&self) -> Option<&str> {
         match self {
-            Self::TextChannel(c) => Some(c.name.clone()),
-            Self::VoiceChannel(c) => Some(c.name.clone()),
-            Self::Group(c) => Some(c.name.clone()),
+            Self::TextChannel(c) => Some(&c.name),
+            Self::VoiceChannel(c) => Some(&c.name),
+            Self::Group(c) => Some(&c.name),
+            Self::SavedMessages(_) => Some("Saved Messages"),
             _ => None
         }
     }

@@ -22,12 +22,18 @@ pub fn DirectMessageList(cx: Scope) -> Element {
             "Direct Messages"
         },
         button {
+            onclick: move |_| {
+                router.push_route("/", None, None);
+            },
             "Home"
         },
         button {
             "Friends"
         },
         button {
+            onclick: move |_| {
+                router.push_route("/saved_messages", None, None);
+            },
             "Saved Notes"
         },
         h3 {
@@ -62,7 +68,7 @@ pub fn DirectMessageList(cx: Scope) -> Element {
                                 Channel::Dm(dm) => {
                                     let user_id = dm.get_recipient(user_id);
                                     let user = user_state.get(user_id).unwrap();
-                                    let (username, avatar) = get_username_avatar(channels_state, server_members_state, user, &None, None);
+                                    let (username, avatar) = get_username_avatar(channels_state, server_members_state, revolt_config, user, &None, None);
 
                                     rsx! {
                                         Fragment {

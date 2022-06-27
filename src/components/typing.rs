@@ -10,6 +10,7 @@ pub fn Typing(cx: Scope<TypingProps>) -> Element {
     let user_state = use_read(&cx, USERS);
     let server_member_state = use_read(&cx, SERVER_MEMBERS);
     let channel_state = use_read(&cx, CHANNELS);
+    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
 
     rsx!(cx, div {
         typing_state.get(&cx.props.channel_id).map(|currently_typing| {
@@ -22,23 +23,20 @@ pub fn Typing(cx: Scope<TypingProps>) -> Element {
 
             for user_id in currently_typing {
                 let user = &user_state[user_id];
-                let (username, avatar) = get_username_avatar(channel_state, server_member_state, user, &None, Some(&cx.props.channel_id));
+                let (username, avatar) = get_username_avatar(channel_state, server_member_state, revolt_config, user, &None, Some(&cx.props.channel_id));
 
                 names.push(username);
                 avatars.push(avatar);
             };
 
-            let formatted_string = match names.len() {
-                1 => {
-                    format!("{} is", names[0])
+            let formatted_string = match names.as_slice() {
+                [name] => {
+                    format!("{} is", name)
                 },
-                2 => {
-                    format!("{} and {} are", names[0], names[1])
-                },
-                _ => {
-                    let last = names.pop().unwrap();
+                names => {
+                    let last = names.last().unwrap();
 
-                    format!("{} and {} are", names.join(", "), last)
+                    format!("{} and {} are", names[..names.len() - 1].join(", "), last)
                 }
             };
 

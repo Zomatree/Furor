@@ -16,7 +16,6 @@ pub fn DmChannel(cx: Scope) -> Element {
             components::DirectMessageList {},
             components::Channel {
                 channel_id: channel_id,
-                name: String::from("temp name")
             }
         }
     })

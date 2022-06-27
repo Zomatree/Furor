@@ -60,7 +60,7 @@ impl Asset {
         if self.default {
             format!("{API_URL}/users/{}/default_avatar", self.id)
         } else {
-            format!("https://{autumn_url}/{}/{}/{}", self.tag, self.id, self.filename)
+            format!("{autumn_url}/{}/{}/{}", self.tag, self.id, self.filename)
         }
     }
 

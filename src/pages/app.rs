@@ -58,6 +58,8 @@ pub fn App(cx: Scope) -> Element {
     let ready = use_read(&cx, READY);
     let set_ready = use_set(&cx, READY);
 
+    let set_saved_messages = use_set(&cx, SAVED_MESSAGES);
+
     log::info!("{user:?} {revolt_config:?}");
 
     if let Some((token, user_id)) = user && let Some(config) = revolt_config && http_state.is_none() {
@@ -78,7 +80,8 @@ pub fn App(cx: Scope) -> Element {
             set_typing_state,
             dm_channel_state,
             set_dm_channel_state,
-            set_ready
+            set_ready,
+            set_saved_messages
         ];
 
         let http = HTTPClient::new(token.clone(), user_id.clone(), API_URL, config.clone());
@@ -101,6 +104,7 @@ pub fn App(cx: Scope) -> Element {
                 set_typing_state.clone(),
                 dm_channel_state.clone(),
                 set_dm_channel_state.clone(),
+                set_saved_messages.clone(),
                 set_ready.clone()
             ).await;
         })
@@ -138,6 +142,10 @@ pub fn App(cx: Scope) -> Element {
         Route {
             to: "/channel/:channel_id",
             loading_ready!(ready, pages::DmChannel)
+        },
+        Route {
+            to: "/saved_messages",
+            loading_ready!(ready, pages::SavedMessages)
         }
     })
 }

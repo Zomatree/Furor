@@ -154,17 +154,6 @@ impl HTTPClient {
             .await
             .unwrap()
     }
-
-    pub async fn fetch_dm_channels(&self) -> Vec<types::Channel> {
-        self.send(
-            self.get("/users/dms")
-        )
-            .await
-            .unwrap()
-            .json()
-            .await
-            .unwrap()
-    }
 }
 
 impl PartialEq for HTTPClient {

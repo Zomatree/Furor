@@ -5,6 +5,7 @@ use crate::prelude::*;
 pub fn get_username_avatar(
     channels: &ChannelState,
     server_members: &ServerMemberState,
+    revolt_config: &types::RevoltConfig,
     user: &types::User,
     masquerade: &Option<types::Masquerade>,
     channel_id: Option<&types::ULID>,
@@ -14,7 +15,7 @@ pub fn get_username_avatar(
             mask.name.clone().unwrap_or_else(|| user.username.clone()),
             mask.avatar
                 .clone()
-                .unwrap_or_else(|| user.avatar.clone().unwrap().url()),
+                .unwrap_or_else(|| user.avatar.clone().unwrap().url(&revolt_config.features.autumn.url)),
         ),
         None => {
             let server = channel_id
@@ -41,12 +42,12 @@ pub fn get_username_avatar(
                             .as_ref()
                             .or(user.avatar.as_ref())
                             .unwrap_or(&default_avatar)
-                            .url(),
+                            .url(&revolt_config.features.autumn.url),
                     )
                 }
                 None => (
                     user.username.clone(),
-                    user.avatar.clone().unwrap_or(default_avatar).url(),
+                    user.avatar.clone().unwrap_or(default_avatar).url(&revolt_config.features.autumn.url),
                 ),
             }
         }

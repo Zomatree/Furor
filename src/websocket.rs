@@ -23,6 +23,7 @@ pub async fn websocket(
     set_typing_state: FermiSetter<TypingState>,
     mut dm_channel_state: DmChannelState,
     set_dm_channel_state: FermiSetter<DmChannelState>,
+    set_saved_messages: FermiSetter<Option<types::SavedMessages>>,
     set_ready: FermiSetter<bool>
 ) {
     let (_, ws) = WsMeta::connect(http.revolt_config.ws.clone(), None)
@@ -81,10 +82,19 @@ pub async fn websocket(
                         set_server_state(server_state.clone());
 
                         for channel in channels {
+                            if let types::Channel::SavedMessages(saved_messages) = &channel {
+                                set_saved_messages(Some(saved_messages.clone()))
+                            };
+
+                            if matches!(channel, types::Channel::DirectMessage { .. } | types::Channel::Group { .. } ) {
+                                dm_channel_state.insert(channel.id());
+                            }
+
                             channel_state.insert(channel.id(), channel);
                         }
 
                         set_channel_state(channel_state.clone());
+                        set_dm_channel_state(dm_channel_state.clone());
 
                         for server in servers {
                             let types::ServerMembers { users, members } = http.fetch_server_members(&server.id).await;
@@ -104,14 +114,6 @@ pub async fn websocket(
 
                         set_user_state(user_state.clone());
                         set_server_member_state(server_member_state.clone());
-
-                        let dm_channels = http.fetch_dm_channels().await;
-
-                        for dm_channel in dm_channels {
-                            dm_channel_state.insert(dm_channel.id());
-                        };
-
-                        set_dm_channel_state(dm_channel_state.clone());
 
                         ready_tx.take().unwrap().send(()).unwrap();
                     },

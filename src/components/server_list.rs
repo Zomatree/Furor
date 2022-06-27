@@ -14,7 +14,7 @@ pub fn ServerList(cx: Scope) -> Element {
 
     let user = &user_state[user_id];
 
-    let (_, avatar) = get_username_avatar(channel_state, server_members_state, user, &None, None);
+    let (_, avatar) = get_username_avatar(channel_state, server_members_state, revolt_config, user, &None, None);
 
     rsx!(cx, div {
         style: "display: flex; width: 56px; min-width: 56px; flex-direction: column; justify-content: flex-start; overflow-y: auto; align-items: center",

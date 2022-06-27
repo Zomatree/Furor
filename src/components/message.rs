@@ -10,6 +10,7 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
     let message_state = use_read(&cx, MESSAGES);
     let channel_state = use_read(&cx, CHANNELS);
     let server_members = use_read(&cx, SERVER_MEMBERS);
+    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
 
     let message = message_state
         .get(&cx.props.channel_id)?
@@ -19,7 +20,7 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
 
     let user_state = use_read(&cx, USERS);
     let user = user_state.get(author).unwrap();
-    let (username, avatar) = get_username_avatar(channel_state, server_members, user, masquerade, Some(channel));
+    let (username, avatar) = get_username_avatar(channel_state, server_members, revolt_config, user, masquerade, Some(channel));
     let content = content.clone().unwrap_or_default();
     let created_at = cx.use_hook(|_| format_datetime(&id.timestamp()));  // only needs to be calculated once
 

@@ -3,18 +3,21 @@ use crate::prelude::*;
 #[derive(Props, PartialEq)]
 pub struct ChannelProps {
     pub channel_id: types::ULID,
-
-    #[props(optional)]
-    pub name: Option<String>
 }
 
 pub fn Channel(cx: Scope<ChannelProps>) -> Element {
-    let channels = use_read(&cx, CHANNELS);
+    let channel_state = use_read(&cx, CHANNELS);
+    let user_state = use_read(&cx, USERS);
 
-    let name = cx.props.name
-        .clone()
-        .or_else(|| channels[&cx.props.channel_id].name())
-        .unwrap();
+    let (_, user_id) = use_read(&cx, USER).as_ref().unwrap();
+
+    let name = match &channel_state[&cx.props.channel_id] {
+        types::Channel::DirectMessage(dm) => {
+            let recipient_id = dm.get_recipient(user_id);
+            &user_state[recipient_id].username
+        },
+        channel => channel.name().unwrap()
+    };
 
     cx.render(rsx! {
         div {
