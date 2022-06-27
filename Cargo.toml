@@ -1,5 +1,5 @@
 [package]
-name = "basic-dioxus-channel"
+name = "revolt-client"
 version = "0.1.0"
 edition = "2021"
 
