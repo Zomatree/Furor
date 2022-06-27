@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use crate::{types::ulid::ULID, AUTUMN_URL, API_URL};
+use crate::{types::ulid::ULID, API_URL};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "lowercase")]
@@ -56,11 +56,11 @@ pub struct Asset {
 }
 
 impl Asset {
-    pub fn url(&self) -> String {
+    pub fn url(&self, autumn_url: &str) -> String {
         if self.default {
             format!("{API_URL}/users/{}/default_avatar", self.id)
         } else {
-            format!("https://{AUTUMN_URL}/{}/{}/{}", self.tag, self.id, self.filename)
+            format!("https://{autumn_url}/{}/{}/{}", self.tag, self.id, self.filename)
         }
     }
 

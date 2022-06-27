@@ -24,7 +24,6 @@ pub mod prelude {
 }
 
 pub const API_URL: &str = "https://api.revolt.chat";
-pub const AUTUMN_URL: &str = "autumn.revolt.chat";
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());

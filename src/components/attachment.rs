@@ -6,8 +6,10 @@ pub struct AttachmentProps {
 }
 
 pub fn Attachment(cx: Scope<AttachmentProps>) -> Element {
+    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+
     let AttachmentProps { asset: types::Asset { size, filename, metadata, .. } } = cx.props;
-    let url = cx.props.asset.url();
+    let url = cx.props.asset.url(&revolt_config.features.autumn.url);
 
     rsx!(cx, div {
         div {
@@ -35,7 +37,7 @@ pub fn Attachment(cx: Scope<AttachmentProps>) -> Element {
                     }
                 })
             },
-            &types::AssetMetadata::Image { width, height } => {
+            types::AssetMetadata::Image { width, height } => {
                 Some(rsx! {
                     div {
                         style: "--width: {width}; --height: {height}; aspect-ratio: {width}/{height}; max-width: min(var(--width), 400); max-height: min(var(--height), 300); display: grid; overflow; hidden",
@@ -51,7 +53,7 @@ pub fn Attachment(cx: Scope<AttachmentProps>) -> Element {
                     }
                 })
             },
-            &types::AssetMetadata::Video { width, height } => {
+            types::AssetMetadata::Video { width, height } => {
                 Some(rsx! {
                     div {
                         style: "--width: {width}; --height: {height}; aspect-ratio: {width}/{height}; max-width: min(var(--width), 400); max-height: min(var(--height), 300); display: grid; overflow; hidden",

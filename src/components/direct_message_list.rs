@@ -12,6 +12,8 @@ pub fn DirectMessageList(cx: Scope) -> Element {
     let user_state = use_read(&cx, USERS);
     let user_id = &use_read(&cx, USER).as_ref().unwrap().1;
     let server_members_state = use_read(&cx, SERVER_MEMBERS);
+    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+
     let router = use_router(&cx);
 
     rsx!(cx, div {
@@ -78,7 +80,7 @@ pub fn DirectMessageList(cx: Scope) -> Element {
                                     rsx! {
                                         Fragment {
                                             group.icon.as_ref().map(|icon| {
-                                                let url = icon.url();
+                                                let url = icon.url(&revolt_config.features.autumn.url);
 
                                                 rsx! {
                                                     components::Icon {

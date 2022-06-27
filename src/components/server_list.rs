@@ -6,11 +6,11 @@ pub fn ServerList(cx: Scope) -> Element {
     let server_state = use_read(&cx, SERVERS);
     let channel_state = use_read(&cx, CHANNELS);
     let server_members_state = use_read(&cx, SERVER_MEMBERS);
-
-    let router = use_router(&cx);
-
+    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
     let (_, user_id) = use_read(&cx, USER).as_ref().unwrap();
     let user_state = use_read(&cx, USERS);
+
+    let router = use_router(&cx);
 
     let user = &user_state[user_id];
 
@@ -31,7 +31,7 @@ pub fn ServerList(cx: Scope) -> Element {
         server_state.values().map(|server| {
             let types::Server { icon, id, .. } = server.clone();
 
-            let icon = icon.unwrap().url();
+            let icon = icon.unwrap().url(&revolt_config.features.autumn.url);
             let key = id.clone();
 
             rsx! {
