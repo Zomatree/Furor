@@ -11,6 +11,8 @@ pub mod hcaptcha;
 pub mod loading;
 pub mod icon;
 pub mod channel;
+pub mod markdown;
+pub mod modal;
 
 pub use message::Message;
 pub use reply::Reply;
@@ -25,3 +27,5 @@ pub use hcaptcha::HCaptcha;
 pub use loading::Loading;
 pub use icon::Icon;
 pub use channel::Channel;
+pub use markdown::Markdown;
+pub use modal::Modal;

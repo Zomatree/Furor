@@ -32,3 +32,4 @@ pub static HTTP: Atom<Option<HTTPClient>> = |_| None;
 pub static USER: Atom<Option<(types::Token, types::ULID)>> = |_| None;
 pub static READY: Atom<bool> = |_| false;
 pub static SAVED_MESSAGES: Atom<Option<types::SavedMessages>> = |_| None;
+pub static MODALS: Atom<Vec<utils::ActiveModal>> = |_| Vec::new();

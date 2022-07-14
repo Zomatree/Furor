@@ -11,6 +11,7 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
     let channel_state = use_read(&cx, CHANNELS);
     let server_members = use_read(&cx, SERVER_MEMBERS);
     let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+    let modal = utils::use_modal(&cx);
 
     let message = message_state
         .get(&cx.props.channel_id)?
@@ -73,7 +74,9 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                             }
                         })
                     },
-                    span { "{content}" }
+                    components::Markdown {
+                        text: content
+                    }
                 },
             }
             attachments.iter().cloned().enumerate().map(|(i, asset)| {
@@ -85,7 +88,16 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                         }
                     }
                 }
-            })
+            }),
+            button {
+                onclick: move |_| {
+                    modal.push_modal(utils::ActiveModal::DeleteMessage {
+                        channel_id: cx.props.channel_id.clone(),
+                        message_id: cx.props.message_id.clone()
+                    })
+                },
+                "delete"
+            }
 
         }
     })

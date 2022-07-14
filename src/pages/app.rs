@@ -127,6 +127,7 @@ pub fn App(cx: Scope) -> Element {
     };
 
     rsx!(cx, Router {
+        components::Modal {},
         Route {
             to: "/login",
             pages::Login {}

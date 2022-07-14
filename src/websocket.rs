@@ -58,7 +58,7 @@ pub async fn websocket(
         let mut ready_tx = Some(ready_tx);
 
         while let Some(WsMessage::Text(payload)) = ws.write().await.next().await {
-            log::debug!("EVENT RECEIVED {payload}");
+            //log::debug!("EVENT RECEIVED {payload}");
 
             match serde_json::from_str::<types::ReceiveWsMessage>(&payload) {
                 Ok(event) => match event {
@@ -147,7 +147,7 @@ pub async fn websocket(
                         }
                     }
                     _ => {
-                        log::info!("IGNORED EVENT: {event:?}");
+                        //log::info!("IGNORED EVENT: {event:?}");
                     }
                 },
                 Err(error) => log::error!("{error:?}\n{payload}"),

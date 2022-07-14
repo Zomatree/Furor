@@ -154,6 +154,14 @@ impl HTTPClient {
             .await
             .unwrap()
     }
+
+    pub async fn delete_message(&self, channel_id: &types::ULID, message_id: &types::ULID) {
+        self.send(
+            self.delete(format!("/channels/{channel_id}/messages/{message_id}"))
+        )
+            .await
+            .unwrap();
+    }
 }
 
 impl PartialEq for HTTPClient {
