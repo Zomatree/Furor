@@ -17,23 +17,25 @@ fn InnerModal<'a>(cx: Scope<'a, InnerModalProps>) -> Element<'a> {
     let modal = use_modal(&cx);
 
     cx.render(rsx! {
-        "{cx.props.title}",
-        "{cx.props.description}",
-        cx.props.buttons.iter().map(|(name, callback)| {
-            let modal = modal.clone();
+        div {
+            "{cx.props.title}",
+            "{cx.props.description}",
+            cx.props.buttons.iter().map(|(name, callback)| {
+                let modal = modal.clone();
 
-            rsx! {
-                button {
-                    onclick: move |_| {
-                        let callback = callback.lock().unwrap().take().unwrap();
-                        log::info!("spawning");
-                        cx.spawn(callback());
-                        modal.pop_modal();
-                    },
-                    "{name}",
+                rsx! {
+                    button {
+                        onclick: move |_| {
+                            let callback = callback.borrow_mut().take().unwrap();
+                            log::info!("spawning");
+                            cx.spawn(callback());
+                            modal.pop_modal();
+                        },
+                        "{name}",
+                    }
                 }
-            }
-        })
+            })
+        }
     })
 }
 

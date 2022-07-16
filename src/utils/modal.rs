@@ -1,10 +1,10 @@
 use futures::{Future};
-use std::{pin::Pin, sync::Mutex, rc::Rc};
+use std::{pin::Pin, rc::Rc, cell::RefCell};
 
 use crate::prelude::*;
 
 pub type BoxFuture<O> = Pin<Box<dyn Future<Output=O> + 'static>>;
-pub type Take<T> = Mutex<Option<T>>;
+pub type Take<T> = RefCell<Option<T>>;
 pub type TakenAsyncFunc = Take<Box<dyn FnOnce() -> BoxFuture<()>>>;
 
 pub fn wrap_async<F, Fut>(func: F) -> TakenAsyncFunc
@@ -12,7 +12,7 @@ where
     F: FnOnce() -> Fut + 'static,
     Fut: Future<Output=()> + 'static
 {
-    Mutex::new(Some(Box::new(|| Box::pin(func()))))
+    RefCell::new(Some(Box::new(|| Box::pin(func()))))
 }
 
 #[derive(Clone)]

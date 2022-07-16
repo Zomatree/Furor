@@ -13,6 +13,7 @@ pub mod icon;
 pub mod channel;
 pub mod markdown;
 pub mod modal;
+pub mod member_list;
 
 pub use message::Message;
 pub use reply::Reply;
@@ -29,3 +30,4 @@ pub use icon::Icon;
 pub use channel::Channel;
 pub use markdown::Markdown;
 pub use modal::Modal;
+pub use member_list::MemberList;
