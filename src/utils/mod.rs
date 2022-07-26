@@ -4,11 +4,13 @@ mod modal;
 mod login;
 mod message;
 mod channel;
+mod files;
 
 pub use modal::*;
 pub use login::*;
 pub use message::*;
 pub use channel::*;
+pub use files::*;
 
 pub fn get_username_avatar(
     channels: &ChannelState,

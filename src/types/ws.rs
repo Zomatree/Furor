@@ -152,7 +152,7 @@ pub enum ReceiveWsMessage {
     },
     MessageDelete {
         #[serde(rename="id")] message_id: ULID,
-        #[serde(rename="channel")] channel_id: String
+        #[serde(rename="channel")] channel_id: ULID
     },
     MessageAppend {
         #[serde(rename="id")] message_id: ULID,

@@ -11,6 +11,7 @@ pub type ServerMemberState =HashMap<types::ULID, HashMap<types::ULID, types::Mem
 pub type MessageState = HashMap<types::ULID, HashMap<types::ULID, types::Message>>;
 pub type TypingState = HashMap<types::ULID, HashSet<types::ULID>>;
 pub type DmChannelState = HashSet<types::ULID>;
+pub type MessageBuilderState = HashMap<types::ULID, utils::MessageBuilder>;
 
 pub type FermiSetter<T> = Rc<dyn Fn(T)>;
 
@@ -33,3 +34,4 @@ pub static USER: Atom<Option<(types::Token, types::ULID)>> = |_| None;
 pub static READY: Atom<bool> = |_| false;
 pub static SAVED_MESSAGES: Atom<Option<types::SavedMessages>> = |_| None;
 pub static MODALS: Atom<Vec<utils::ActiveModal>> = |_| Vec::new();
+pub static MESSAGE_BUILDERS: Atom<HashMap<types::ULID, utils::MessageBuilder>> = |_| HashMap::new();

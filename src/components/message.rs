@@ -11,6 +11,9 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
     let channel_state = use_read(&cx, CHANNELS);
     let server_members = use_read(&cx, SERVER_MEMBERS);
     let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+    let message_builder_state = use_read(&cx, MESSAGE_BUILDERS);
+    let set_message_builders = use_set(&cx, MESSAGE_BUILDERS);
+
     let modal = utils::use_modal(&cx);
 
     let message = message_state
@@ -24,6 +27,22 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
     let (username, avatar) = get_username_avatar(channel_state, server_members, revolt_config, user, masquerade, Some(channel));
     let content = content.clone().unwrap_or_default();
     let created_at = cx.use_hook(|_| format_datetime(&id.timestamp()));  // only needs to be calculated once
+
+    let message_builder = match message_builder_state.get(&cx.props.channel_id) {
+        Some(message_builder) => message_builder.clone(),
+        None => {
+            let message_builder = utils::MessageBuilder::new();
+            let mut message_builders = message_builder_state.clone();
+            message_builders.insert(cx.props.channel_id.clone(), message_builder);
+            message_builders.get(&cx.props.channel_id).unwrap().clone()
+        }
+    };
+
+    let set_message_builder = move |builder| {
+        let mut message_builders = message_builder_state.clone();
+        message_builders.insert(cx.props.channel_id.clone(), builder);
+        set_message_builders(message_builders);
+    };
 
     cx.render(rsx! {
         div {
@@ -97,6 +116,12 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                     })
                 },
                 "delete"
+            },
+            button {
+                onclick: move |_| {
+                    set_message_builder(message_builder.clone().push_reply(types::Reply { id: cx.props.message_id.clone(), mention: false }))
+                },
+                "reply"
             }
 
         }

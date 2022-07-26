@@ -23,6 +23,7 @@ pub fn MemberList<'a>(cx: Scope<'a, MemberListProps>) -> Element<'a> {
 
                 rsx! {
                     div {
+                        key: "{member_id}",
                         components::Icon {
                             src: avatar
                         },

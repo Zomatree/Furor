@@ -36,7 +36,7 @@ pub async fn websocket(
 
     let (ready_tx, ready_rx) = oneshot::channel();
 
-    join!(async move {
+    let task1 = async move {
         ready_rx.await.unwrap();
         set_ready(true);
 
@@ -44,8 +44,8 @@ pub async fn websocket(
             bg_ws.write().await.send(WsMessage::Text(serde_json::to_string(&types::SendWsMessage::Ping { data: 0 }).unwrap())).await.unwrap();
             sleep(Duration::from_secs(30)).await;
         }
-    },
-    async move {
+    };
+    let task2 = async move {
         ws.write().await.send(WsMessage::Text(
             serde_json::to_string(&types::SendWsMessage::Authenticate {
                 token: http.token.inner().to_string(),
@@ -145,13 +145,22 @@ pub async fn websocket(
                                 set_message_state(message_state.clone());
                             }
                         }
+                    },
+                    types::ReceiveWsMessage::MessageDelete { message_id, channel_id } => {
+                        if let Some(channel) = message_state.get_mut(&channel_id) {
+                            if channel.remove(&message_id).is_some() {
+                                set_message_state(message_state.clone());
+                            }
+                        }
                     }
                     _ => {
-                        //log::info!("IGNORED EVENT: {event:?}");
+                        log::info!("IGNORED EVENT: {:?}", event);
                     }
                 },
                 Err(error) => log::error!("{error:?}\n{payload}"),
             }
         }
-    });
+    };
+
+    join!(task1, task2);
 }

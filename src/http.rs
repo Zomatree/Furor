@@ -1,4 +1,4 @@
-use reqwest::{Client, ClientBuilder, header::HeaderMap, RequestBuilder, Method, Response, Error as ReqwestError};
+use reqwest::{Client, ClientBuilder, header::HeaderMap, RequestBuilder, Method, Response, Error as ReqwestError, multipart::{Form, Part}};
 use std::{
     collections::HashMap,
     sync::Arc,
@@ -75,12 +75,13 @@ impl HTTPClient {
     }
 
     #[async_recursion(?Send)]
-    async fn send(&self, builder: RequestBuilder) -> Result<Response, ReqwestError> {
+    async fn send_handle_rl(&self, builder: RequestBuilder) -> Result<Response, ReqwestError> {
         let resp = builder
             .try_clone()
             .unwrap()
             .send()
-            .await?;
+            .await
+            .unwrap();
 
         match resp.status().as_u16() {
             200..=299 => {
@@ -115,16 +116,22 @@ impl HTTPClient {
 
                 sleep(Duration::from_millis(body.retry_after)).await;
 
-                self.send(builder).await
+                self.send_handle_rl(builder).await
             },
             _ => Ok(resp)
         }
     }
 
+    async fn send(&self, builder: RequestBuilder) -> Result<Response, ReqwestError> {
+        builder
+            .send()
+            .await
+    }
+
     pub async fn send_message(&self, channel_id: &types::ULID, message: types::SendMessage) -> types::Message {
-        self.send(
+        self.send_handle_rl(
             self.post(format!("/channels/{channel_id}/messages"))
-            .json(&message)
+                .json(&message)
         )
             .await
             .unwrap()
@@ -134,7 +141,7 @@ impl HTTPClient {
     }
 
     pub async fn fetch_server_members(&self, server_id: &types::ULID) -> types::ServerMembers {
-        self.send(
+        self.send_handle_rl(
             self.get(format!("/servers/{server_id}/members"))
         )
             .await
@@ -145,7 +152,7 @@ impl HTTPClient {
     }
 
     pub async fn fetch_message(&self, channel_id: &types::ULID, message_id: &types::ULID) -> types::Message {
-        self.send(
+        self.send_handle_rl(
             self.get(format!("/channels/{channel_id}/messages/{message_id}"))
         )
             .await
@@ -156,11 +163,29 @@ impl HTTPClient {
     }
 
     pub async fn delete_message(&self, channel_id: &types::ULID, message_id: &types::ULID) {
-        self.send(
+        self.send_handle_rl(
             self.delete(format!("/channels/{channel_id}/messages/{message_id}"))
         )
             .await
             .unwrap();
+    }
+
+    pub async fn upload_file(&self, tag: &'static str, content: Vec<u8>, filename: String) -> types::AutumnResponse {
+        let multipart = reqwest::multipart::Form::new()
+            .part("file",
+                Part::bytes(content)
+                .file_name(filename)
+            );
+
+        let request = self.client.request(Method::POST, &format!("{}/{tag}", self.revolt_config.features.autumn.url))
+            .multipart(multipart);
+
+        self.send(request)
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap()
     }
 }
 

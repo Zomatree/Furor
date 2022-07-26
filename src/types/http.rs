@@ -169,3 +169,9 @@ pub enum Login {
 pub struct TooManyRequests {
     pub retry_after: u64
 }
+
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AutumnResponse {
+    pub id: types::ULID
+}
