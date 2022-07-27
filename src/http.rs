@@ -26,27 +26,30 @@ pub struct HTTPClient {
     pub client: Client,
     pub base_url: &'static str,
     pub revolt_config: Arc<types::RevoltConfig>,
-    pub ratelimits: Arc<Mutex<HashMap<String, Ratelimit>>>
+    pub ratelimits: Arc<Mutex<HashMap<String, Ratelimit>>>,
+    pub default_headers: HeaderMap
 }
 
 impl HTTPClient {
     pub fn new(token: types::Token, user_id: types::ULID, base_url: &'static str, revolt_config: types::RevoltConfig) -> Self {
         let (header_key, header_value) = token.to_header();
 
-        let mut headers = HeaderMap::new();
-        headers.insert(header_key, header_value.parse().unwrap());
+        let mut default_headers = HeaderMap::new();
+        default_headers.insert(header_key, header_value.parse().unwrap());
 
         let client = ClientBuilder::new()
-            .default_headers(headers)
             .build()
             .unwrap();
 
-        Self { token, user_id, client, base_url, revolt_config: Arc::new(revolt_config), ratelimits: Arc::new(Mutex::new(HashMap::new())) }
+        Self { token, user_id, client, base_url, revolt_config: Arc::new(revolt_config), ratelimits: Arc::new(Mutex::new(HashMap::new())), default_headers }
     }
 
     #[inline]
     fn build<T: AsRef<str>>(&self, method: Method, route: T) -> RequestBuilder {
-        self.client.request(method, format!("{}{}", self.base_url, route.as_ref()))
+        self.client
+            .request(method, format!("{}{}", self.base_url, route.as_ref()))
+            .headers(self.default_headers.clone())
+
     }
 
     #[inline]
