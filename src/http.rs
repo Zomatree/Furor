@@ -190,6 +190,15 @@ impl HTTPClient {
             .await
             .unwrap()
     }
+
+    pub async fn edit_message(&self, channel_id: &types::ULID, message_id: &types::ULID, message: types::SendMessage) {
+        self.send(
+            self.patch(format!("/channels/{channel_id}/messages/{message_id}"))
+            .json(&message)
+        )
+            .await
+            .unwrap();
+    }
 }
 
 impl PartialEq for HTTPClient {

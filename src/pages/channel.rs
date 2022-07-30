@@ -18,12 +18,12 @@ pub fn Channel(cx: Scope) -> Element {
                 server_id: server_id.clone()
             },
             components::Channel {
-                channel_id: channel_id.clone()
+                channel_id: channel_id
             },
-            components::MemberList {
-                channel_id: channel_id,
-                server_id: server_id
-            }
+            // components::MemberList {
+            //     channel_id: channel_id,
+            //     server_id: server_id
+            // }
         }
     })
 }

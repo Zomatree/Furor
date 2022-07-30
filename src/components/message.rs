@@ -13,6 +13,9 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
     let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
     let message_builder_state = use_read(&cx, MESSAGE_BUILDERS);
     let set_message_builders = use_set(&cx, MESSAGE_BUILDERS);
+    let user_state = use_read(&cx, USERS);
+    let currently_editing = use_read(&cx, CURRENTLY_EDITING).as_ref();
+    let set_currently_editing = use_set(&cx, CURRENTLY_EDITING);
 
     let modal = utils::use_modal(&cx);
 
@@ -22,7 +25,6 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
 
     let types::Message { content, author, attachments, channel, masquerade, replies, edited, id, .. } = message;
 
-    let user_state = use_read(&cx, USERS);
     let user = user_state.get(author).unwrap();
     let (username, avatar) = get_username_avatar(channel_state, server_members, revolt_config, user, masquerade, Some(channel));
     let content = content.clone().unwrap_or_default();
@@ -93,8 +95,20 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                             }
                         })
                     },
-                    components::Markdown {
-                        text: content
+                    if Some(id) == currently_editing {
+                        rsx! {
+                            components::MessageEditor {
+                                message_id: id.clone(),
+                                channel_id: channel.clone(),
+                                initial_text: content
+                            }
+                        }
+                    } else {
+                        rsx! {
+                            components::Markdown {
+                                text: content
+                            }
+                        }
                     }
                 },
             }
@@ -122,8 +136,13 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                     set_message_builder(message_builder.clone().push_reply(types::Reply { id: cx.props.message_id.clone(), mention: false }))
                 },
                 "reply"
-            }
-
+            },
+            button {
+                onclick: move |_| {
+                    set_currently_editing(Some(id.clone()))
+                },
+                "edit"
+            },
         }
     })
 }

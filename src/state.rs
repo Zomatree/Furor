@@ -25,6 +25,7 @@ pub static DM_CHANNELS: Atom<DmChannelState> = |_| HashSet::new();
 
 pub static CURRENT_SERVER: Atom<Option<types::ULID>> = |_| None;
 pub static CURRENT_CHANNEL: Atom<Option<types::ULID>> = |_| None;
+pub static CURRENTLY_EDITING: Atom<Option<types::ULID>> = |_| None;
 
 pub static REVOLT_CONFIG: Atom<Option<types::RevoltConfig>> = |_| None;
 

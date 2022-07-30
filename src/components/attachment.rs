@@ -40,7 +40,7 @@ pub fn Attachment(cx: Scope<AttachmentProps>) -> Element {
             types::AssetMetadata::Image { width, height } => {
                 Some(rsx! {
                     div {
-                        style: "--width: {width}; --height: {height}; aspect-ratio: {width}/{height}; max-width: min(var(--width), 400); max-height: min(var(--height), 300); display: grid; overflow; hidden",
+                        style: "--width: {width}; --height: {height}; max-width: min(var(--width), 400); max-height: min(var(--height), 300); display: grid; overflow; hidden",
                         width: "{width}",
                         height: "{height}",
                         img {
@@ -56,7 +56,7 @@ pub fn Attachment(cx: Scope<AttachmentProps>) -> Element {
             types::AssetMetadata::Video { width, height } => {
                 Some(rsx! {
                     div {
-                        style: "--width: {width}; --height: {height}; aspect-ratio: {width}/{height}; max-width: min(var(--width), 400); max-height: min(var(--height), 300); display: grid; overflow; hidden",
+                        style: "--width: {width}; --height: {height}; max-width: min(var(--width), 400); max-height: min(var(--height), 300); display: grid; overflow; hidden",
                         width: "{width}",
                         height: "{height}",
                         video {
