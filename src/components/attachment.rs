@@ -6,7 +6,7 @@ pub struct AttachmentProps {
 }
 
 pub fn Attachment(cx: Scope<AttachmentProps>) -> Element {
-    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+    let revolt_config = use_config(&cx);
 
     let AttachmentProps { asset: types::Asset { size, filename, metadata, .. } } = cx.props;
     let url = cx.props.asset.url(&revolt_config.features.autumn.url);

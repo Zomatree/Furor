@@ -9,7 +9,7 @@ pub struct MessageEditorProps {
 }
 
 pub fn MessageEditor(cx: Scope<MessageEditorProps>) -> Element {
-    let http = use_read(&cx, HTTP).as_ref().unwrap();
+    let http = use_http(&cx);
     let set_currently_editing = use_set(&cx, CURRENTLY_EDITING);
     let content = use_state(&cx, || cx.props.initial_text.clone());
 

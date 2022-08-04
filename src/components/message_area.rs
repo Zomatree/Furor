@@ -12,10 +12,10 @@ pub fn MessageArea(cx: Scope<MessageAreaProps>) -> Element {
     let message_state = use_read(&cx, MESSAGES);
     let channel_state = use_read(&cx, CHANNELS);
     let member_state = use_read(&cx, SERVER_MEMBERS);
-    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+    let revolt_config = use_config(&cx);
     let users = use_read(&cx, USERS);
 
-    let http = use_read(&cx, HTTP).as_ref().unwrap();
+    let http = use_http(&cx);
 
     let channel_messages = message_state.get(&cx.props.channel_id).cloned().unwrap_or_default();
 

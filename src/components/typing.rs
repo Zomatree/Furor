@@ -10,7 +10,7 @@ pub fn Typing(cx: Scope<TypingProps>) -> Element {
     let user_state = use_read(&cx, USERS);
     let server_member_state = use_read(&cx, SERVER_MEMBERS);
     let channel_state = use_read(&cx, CHANNELS);
-    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+    let revolt_config = use_config(&cx);
 
     rsx!(cx, div {
         typing_state.get(&cx.props.channel_id).map(|currently_typing| {

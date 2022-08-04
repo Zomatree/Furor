@@ -77,3 +77,21 @@ pub fn format_datetime<Tz: chrono::TimeZone>(dt: &chrono::DateTime<Tz>) -> Strin
         dt.format("%d/%m/%Y").to_string()
     }
 }
+
+pub fn use_http(cx: &ScopeState) -> &HTTPClient {
+    use_read(cx, HTTP).as_ref().unwrap()
+}
+
+pub fn use_config(cx: &ScopeState) -> &RevoltConfig {
+    use_read(cx, REVOLT_CONFIG).as_ref().unwrap()
+}
+
+#[macro_export]
+macro_rules! move_variables {
+    ($($variable: ident),+) => {
+        $(
+            #[allow(unused_mut)]
+            let mut $variable = $variable;
+        )+
+    };
+}

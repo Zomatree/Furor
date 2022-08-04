@@ -11,7 +11,7 @@ pub fn Reply(cx: Scope<ReplyProps>) -> Element {
     let http = use_read(&cx, HTTP).clone().unwrap();
     let channels_state = use_read(&cx, CHANNELS);
     let server_members_state = use_read(&cx, SERVER_MEMBERS);
-    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+    let revolt_config = use_config(&cx);
     let user_state = use_read(&cx, USERS);
 
     let message_state = use_read(&cx, MESSAGES);

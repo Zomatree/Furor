@@ -6,7 +6,7 @@ pub fn ServerList(cx: Scope) -> Element {
     let server_state = use_read(&cx, SERVERS);
     let channel_state = use_read(&cx, CHANNELS);
     let server_members_state = use_read(&cx, SERVER_MEMBERS);
-    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+    let revolt_config = use_config(&cx);
     let (_, user_id) = use_read(&cx, USER).as_ref().unwrap();
     let user_state = use_read(&cx, USERS);
 

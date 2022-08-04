@@ -10,7 +10,7 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
     let message_state = use_read(&cx, MESSAGES);
     let channel_state = use_read(&cx, CHANNELS);
     let server_members = use_read(&cx, SERVER_MEMBERS);
-    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+    let revolt_config = use_config(&cx);
     let message_builder_state = use_read(&cx, MESSAGE_BUILDERS);
     let set_message_builders = use_set(&cx, MESSAGE_BUILDERS);
     let user_state = use_read(&cx, USERS);

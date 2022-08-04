@@ -10,7 +10,7 @@ pub fn MemberList<'a>(cx: Scope<'a, MemberListProps>) -> Element<'a> {
     let channel_state = use_read(&cx, CHANNELS);
     let member_state = use_read(&cx, SERVER_MEMBERS);
     let user_state = use_read(&cx, USERS);
-    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+    let revolt_config = use_config(&cx);
     let member_list = &member_state[&cx.props.server_id];
 
     cx.render(rsx! {

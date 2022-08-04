@@ -12,7 +12,7 @@ pub fn DirectMessageList(cx: Scope) -> Element {
     let user_state = use_read(&cx, USERS);
     let user_id = &use_read(&cx, USER).as_ref().unwrap().1;
     let server_members_state = use_read(&cx, SERVER_MEMBERS);
-    let revolt_config = use_read(&cx, REVOLT_CONFIG).as_ref().unwrap();
+    let revolt_config = use_config(&cx);
 
     let router = use_router(&cx);
 
