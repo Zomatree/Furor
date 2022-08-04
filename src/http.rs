@@ -1,7 +1,7 @@
 use reqwest::{Client, ClientBuilder, header::HeaderMap, RequestBuilder, Method, Response, Error as ReqwestError, multipart::{Form, Part}};
 use std::{
     collections::HashMap,
-    sync::Arc,
+    rc::Rc,
     time::Duration
 };
 use async_std::{
@@ -25,8 +25,8 @@ pub struct HTTPClient {
     pub user_id: types::ULID,
     pub client: Client,
     pub base_url: &'static str,
-    pub revolt_config: Arc<types::RevoltConfig>,
-    pub ratelimits: Arc<Mutex<HashMap<String, Ratelimit>>>,
+    pub revolt_config: Rc<types::RevoltConfig>,
+    pub ratelimits: Rc<Mutex<HashMap<String, Ratelimit>>>,
     pub default_headers: HeaderMap
 }
 
@@ -41,7 +41,7 @@ impl HTTPClient {
             .build()
             .unwrap();
 
-        Self { token, user_id, client, base_url, revolt_config: Arc::new(revolt_config), ratelimits: Arc::new(Mutex::new(HashMap::new())), default_headers }
+        Self { token, user_id, client, base_url, revolt_config: Rc::new(revolt_config), ratelimits: Rc::new(Mutex::new(HashMap::new())), default_headers }
     }
 
     #[inline]
