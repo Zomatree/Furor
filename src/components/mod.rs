@@ -15,6 +15,7 @@ pub mod markdown;
 pub mod modal;
 pub mod member_list;
 pub mod message_editor;
+pub mod context_menu;
 
 pub use message::Message;
 pub use reply::Reply;
@@ -33,3 +34,4 @@ pub use markdown::Markdown;
 pub use modal::Modal;
 pub use member_list::MemberList;
 pub use message_editor::MessageEditor;
+pub use context_menu::ContextMenu;

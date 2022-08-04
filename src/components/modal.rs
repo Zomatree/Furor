@@ -4,7 +4,7 @@ use crate::prelude::*;
 struct InnerModalProps {
     pub title: &'static str,
     pub description: &'static str,
-    pub buttons: Vec<(&'static str, utils::TakenAsyncFunc)>,
+    pub buttons: Vec<(&'static str, utils::TakenAsyncFunc<(), ()>)>,
 }
 
 impl PartialEq for InnerModalProps {

@@ -2,6 +2,8 @@
 #![feature(let_chains)]
 #![feature(never_type)]
 #![feature(trait_alias)]
+#![feature(unboxed_closures)]
+#![feature(fn_traits)]
 #![allow(non_snake_case)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 

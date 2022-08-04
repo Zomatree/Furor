@@ -127,6 +127,7 @@ pub fn App(cx: Scope) -> Element {
     };
 
     rsx!(cx, Router {
+        components::ContextMenu {},
         components::Modal {},
         Route {
             to: "/login",
