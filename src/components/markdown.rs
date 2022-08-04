@@ -90,7 +90,15 @@ fn render_markdown<'a, 'b>(node: &'b AstNode<'b>) -> LazyNodes<'a, 'b> {
                     }
                 }
             }
-            _ => todo!()
+            _ => {
+                let inner = render_markdown(node);
+
+                rsx! {
+                    "todo",
+                    inner,
+                    "todo"
+                }
+            }
         }
     });
 
