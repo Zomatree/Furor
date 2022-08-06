@@ -16,6 +16,7 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
     let user_state = use_read(&cx, USERS);
     let currently_editing = use_read(&cx, CURRENTLY_EDITING).as_ref();
     let set_currently_editing = use_set(&cx, CURRENTLY_EDITING);
+    let context_menu = use_context_menu(&cx);
 
     let modal = utils::use_modal(&cx);
 
@@ -48,6 +49,10 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
 
     cx.render(rsx! {
         div {
+            oncontextmenu: move |_| {
+                context_menu.set(Some(ActiveContextMenu::Message { message_id: id.clone(), channel_id: channel.clone() }));
+            },
+            prevent_default: "oncontextmenu",
             style: "display: flex; padding: 0.125rem; margin-top: 12px; padding-inline-end: 16px; flex-direction: column",
             div {
                 style: "display: flex; flex-direction: column",
@@ -133,7 +138,7 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
             },
             button {
                 onclick: move |_| {
-                    set_message_builder(message_builder.clone().push_reply(types::Reply { id: cx.props.message_id.clone(), mention: false }))
+                    set_message_builder(message_builder.clone().push_reply(types::Reply { id: id.clone(), mention: false }))
                 },
                 "reply"
             },
@@ -142,7 +147,7 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                     set_currently_editing(Some(id.clone()))
                 },
                 "edit"
-            },
+            }
         }
     })
 }

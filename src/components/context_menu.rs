@@ -12,13 +12,18 @@ impl PartialEq for ContextMenuInnerProps {
 }
 
 fn ContextMenuInner(cx: Scope<ContextMenuInnerProps>) -> Element {
+    let context_menu = use_context_menu(&cx);
+
     cx.render(rsx! {
         cx.props.buttons.iter().map(|(text, cell)| {
+            let context_menu = context_menu.clone();
+
             rsx! {
                 button {
                     onclick: move |_| {
                         let callback = cell.borrow_mut().take().unwrap();
                         cx.spawn(callback());
+                        context_menu.set(None);
                     },
                     "{text}"
                 }
@@ -29,7 +34,7 @@ fn ContextMenuInner(cx: Scope<ContextMenuInnerProps>) -> Element {
 
 pub fn ContextMenu(cx: Scope) -> Element {
     let context_menu = use_context_menu(&cx);
-    let http = use_http(&cx);
+    let modal = use_modal(&cx);
 
     cx.render(rsx! {
         context_menu.get().as_ref().map(|context_menu| {
@@ -37,12 +42,12 @@ pub fn ContextMenu(cx: Scope) -> Element {
                 ActiveContextMenu::Message { message_id, channel_id } => {
                     vec![
                         ("Delete Message", {
-                            to_owned![message_id, channel_id, http];
+                            to_owned![modal, message_id, channel_id];
 
                             wrap_async(async move || {
-                                move_variables![message_id, channel_id, http];
+                                move_variables![modal, message_id, channel_id];
 
-                                http.delete_message(&channel_id, &message_id).await;
+                                modal.push_modal(ActiveModal::DeleteMessage { channel_id, message_id })
                             })
                         })
                     ]

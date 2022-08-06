@@ -11,21 +11,21 @@ pub enum ActiveModal {
 }
 
 #[derive(Clone)]
-pub struct UseModal<'a> {
-    current: &'a Vec<ActiveModal>,
-    setter: &'a Rc<dyn Fn(Vec<ActiveModal>)>
+pub struct UseModal {
+    current: Rc<Vec<ActiveModal>>,
+    setter: Rc<dyn Fn(Vec<ActiveModal>)>
 }
 
-impl<'a> UseModal<'a> {
+impl UseModal {
     pub fn push_modal(&self, modal: ActiveModal) {
-        let mut current = self.current.clone();
+        let mut current = (*self.current).clone();
         current.push(modal);
 
         (self.setter)(current)
     }
 
     pub fn pop_modal(&self) -> Option<ActiveModal> {
-        let mut current = self.current.clone();
+        let mut current = (*self.current).clone();
         let last = current.pop();
 
         (self.setter)(current);
@@ -34,9 +34,9 @@ impl<'a> UseModal<'a> {
     }
 }
 
-pub fn use_modal(cx: &ScopeState) -> UseModal<'_> {
-    let modals = use_read(cx, MODALS);
-    let set_modals = use_set(cx, MODALS);
+pub fn use_modal(cx: &ScopeState) -> UseModal {
+    let modals = use_read_rc(cx, MODALS).clone();
+    let set_modals = use_set(cx, MODALS).clone();
 
     UseModal { current: modals, setter: set_modals }
 }
