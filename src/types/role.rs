@@ -11,5 +11,5 @@ pub struct Role {
     pub hoist: bool,
 
     #[serde(default)]
-    pub rank: i16
+    pub rank: i64
 }

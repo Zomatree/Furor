@@ -76,7 +76,7 @@ pub struct ServerRoleUpdateData {
     pub name: Option<String>,
     pub colour: Option<String>,
     pub hoist: Option<bool>,
-    pub rank: Option<i16>
+    pub rank: Option<i64>
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
