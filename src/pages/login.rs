@@ -40,7 +40,7 @@ pub fn Login(cx: Scope) -> Element {
     let config = use_read(&cx, REVOLT_CONFIG);
     let set_user = use_set(&cx, USER);
     let login_state = use_state(&cx, || LoginState::Details { email: String::new(), password: String::new() });
-    let client = cx.use_hook(|_| reqwest::Client::new());
+    let client = cx.use_hook(reqwest::Client::new);
 
     if get_local_storage_user().is_some() {
         router.push_route("/", None, None)

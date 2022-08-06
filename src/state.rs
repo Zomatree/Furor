@@ -1,4 +1,4 @@
-use dioxus::fermi::Atom;
+use fermi::Atom;
 use std::rc::Rc;
 use im_rc::{HashMap, HashSet};
 

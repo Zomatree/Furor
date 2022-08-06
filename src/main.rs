@@ -18,6 +18,9 @@ pub mod websocket;
 
 pub mod prelude {
     pub use dioxus::prelude::*;
+    pub use dioxus_web::*;
+    pub use fermi::prelude::*;
+    pub use dioxus_router::*;
     pub use dioxus::core::to_owned;
     pub use crate::*;
     pub use crate::types;
@@ -31,7 +34,7 @@ pub const API_URL: &str = "https://api.revolt.chat";
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
-    dioxus::web::launch(pages::App);
+    dioxus_web::launch(pages::App);
 }
 
 #[cfg(test)]

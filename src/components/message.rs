@@ -28,7 +28,7 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
     let user = user_state.get(author).unwrap();
     let (username, avatar) = get_username_avatar(channel_state, server_members, revolt_config, user, masquerade, Some(channel));
     let content = content.clone().unwrap_or_default();
-    let created_at = cx.use_hook(|_| format_datetime(&id.timestamp()));  // only needs to be calculated once
+    let created_at = cx.use_hook(|| format_datetime(&id.timestamp()));  // only needs to be calculated once
 
     let message_builder = match message_builder_state.get(&cx.props.channel_id) {
         Some(message_builder) => message_builder.clone(),

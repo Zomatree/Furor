@@ -4,7 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-dioxus = { git="https://github.com/DioxusLabs/dioxus/", features = ["web", "macro", "hooks", "html", "fermi", "router"] }
+dioxus = { git="https://github.com/DioxusLabs/dioxus/", features = ["macro", "hooks", "html"] }
+fermi = { git="https://github.com/DioxusLabs/dioxus/" }
+dioxus-router = { git="https://github.com/DioxusLabs/dioxus/" }
+dioxus-web = { git="https://github.com/DioxusLabs/dioxus/" }
+
 async-std = { version = "1.0" }
 serde = { version = "1.0.133", features = ["derive"] }
 serde_json = "1.0.75"

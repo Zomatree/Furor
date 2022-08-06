@@ -20,7 +20,7 @@ macro_rules! loading_ready {
 pub fn App(cx: Scope) -> Element {
     let set_user = use_set(&cx, USER);
 
-    cx.use_hook(|_| {
+    cx.use_hook(|| {
         let user = LocalStorage::get::<(types::Token, types::ULID)>("user").ok();
         log::info!("{user:?}");
         set_user(user);

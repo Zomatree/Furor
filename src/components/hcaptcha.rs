@@ -19,7 +19,7 @@ impl<F: FnOnce(String) + 'static> PartialEq for HCaptchaProps<F> {
 pub fn HCaptcha<F: FnOnce(String) + 'static>(cx: Scope<HCaptchaProps<F>>) -> Element {
     let sitekey = &cx.props.sitekey;
 
-    cx.use_hook(|_| {
+    cx.use_hook(|| {
         let oncomplete = &cx.props.complete_callback;
         let owned = oncomplete.lock().unwrap().take().unwrap();
 

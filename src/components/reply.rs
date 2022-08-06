@@ -19,7 +19,7 @@ pub fn Reply(cx: Scope<ReplyProps>) -> Element {
 
     let reply = use_state(&cx, || None::<types::Message>);
 
-    cx.use_hook(|_| cx.spawn({
+    cx.use_hook(|| cx.spawn({
         let reply = reply.clone();
         let mut message_state = message_state.clone();
         let set_message_state = set_message_state.clone();

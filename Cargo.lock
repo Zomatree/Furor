@@ -37,9 +37,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.57"
+version = "1.0.59"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08f9b8508dccb7687a1d6c4ce66b2b0ecef467c94667de27d8d7fe1f8d2a9cdc"
+checksum = "c91f1f46651137be86f3a2b9a8359f9ab421d04d941c62b5982e1ca21113adf9"
 
 [[package]]
 name = "anymap2"
@@ -500,21 +500,19 @@ dependencies = [
 [[package]]
 name = "dioxus"
 version = "0.2.4"
-source = "git+https://github.com/DioxusLabs/dioxus/#62294d36d948be5f070bffea3fdbb6d43fe1bbe5"
+source = "git+https://github.com/DioxusLabs/dioxus/#9538cfe7338cfd94f7392ce79c5d73798475298e"
 dependencies = [
  "dioxus-core",
  "dioxus-core-macro",
  "dioxus-hooks",
  "dioxus-html",
- "dioxus-router",
- "dioxus-web",
- "fermi",
+ "dioxus-rsx",
 ]
 
 [[package]]
 name = "dioxus-core"
 version = "0.2.1"
-source = "git+https://github.com/DioxusLabs/dioxus/#62294d36d948be5f070bffea3fdbb6d43fe1bbe5"
+source = "git+https://github.com/DioxusLabs/dioxus/#9538cfe7338cfd94f7392ce79c5d73798475298e"
 dependencies = [
  "backtrace",
  "bumpalo",
@@ -533,9 +531,9 @@ dependencies = [
 [[package]]
 name = "dioxus-core-macro"
 version = "0.2.1"
-source = "git+https://github.com/DioxusLabs/dioxus/#62294d36d948be5f070bffea3fdbb6d43fe1bbe5"
+source = "git+https://github.com/DioxusLabs/dioxus/#9538cfe7338cfd94f7392ce79c5d73798475298e"
 dependencies = [
- "proc-macro-error",
+ "dioxus-rsx",
  "proc-macro2",
  "quote",
  "syn",
@@ -544,7 +542,7 @@ dependencies = [
 [[package]]
 name = "dioxus-hooks"
 version = "0.2.1"
-source = "git+https://github.com/DioxusLabs/dioxus/#62294d36d948be5f070bffea3fdbb6d43fe1bbe5"
+source = "git+https://github.com/DioxusLabs/dioxus/#9538cfe7338cfd94f7392ce79c5d73798475298e"
 dependencies = [
  "dioxus-core",
  "futures-channel",
@@ -554,7 +552,7 @@ dependencies = [
 [[package]]
 name = "dioxus-html"
 version = "0.2.1"
-source = "git+https://github.com/DioxusLabs/dioxus/#62294d36d948be5f070bffea3fdbb6d43fe1bbe5"
+source = "git+https://github.com/DioxusLabs/dioxus/#9538cfe7338cfd94f7392ce79c5d73798475298e"
 dependencies = [
  "dioxus-core",
  "enumset",
@@ -567,7 +565,7 @@ dependencies = [
 [[package]]
 name = "dioxus-interpreter-js"
 version = "0.2.1"
-source = "git+https://github.com/DioxusLabs/dioxus/#62294d36d948be5f070bffea3fdbb6d43fe1bbe5"
+source = "git+https://github.com/DioxusLabs/dioxus/#9538cfe7338cfd94f7392ce79c5d73798475298e"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
@@ -577,28 +575,32 @@ dependencies = [
 [[package]]
 name = "dioxus-router"
 version = "0.2.3"
-source = "git+https://github.com/DioxusLabs/dioxus/#62294d36d948be5f070bffea3fdbb6d43fe1bbe5"
+source = "git+https://github.com/DioxusLabs/dioxus/#9538cfe7338cfd94f7392ce79c5d73798475298e"
 dependencies = [
- "dioxus-core",
- "dioxus-core-macro",
- "dioxus-html",
+ "dioxus",
  "futures-channel",
  "futures-util",
- "gloo-events",
- "js-sys",
  "log",
  "serde",
  "serde_urlencoded",
  "thiserror",
  "url",
- "wasm-bindgen",
- "web-sys",
+]
+
+[[package]]
+name = "dioxus-rsx"
+version = "0.0.0"
+source = "git+https://github.com/DioxusLabs/dioxus/#9538cfe7338cfd94f7392ce79c5d73798475298e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
 name = "dioxus-web"
 version = "0.2.1"
-source = "git+https://github.com/DioxusLabs/dioxus/#62294d36d948be5f070bffea3fdbb6d43fe1bbe5"
+source = "git+https://github.com/DioxusLabs/dioxus/#9538cfe7338cfd94f7392ce79c5d73798475298e"
 dependencies = [
  "anyhow",
  "console_error_panic_hook",
@@ -718,7 +720,7 @@ dependencies = [
 [[package]]
 name = "fermi"
 version = "0.2.1"
-source = "git+https://github.com/DioxusLabs/dioxus/#62294d36d948be5f070bffea3fdbb6d43fe1bbe5"
+source = "git+https://github.com/DioxusLabs/dioxus/#9538cfe7338cfd94f7392ce79c5d73798475298e"
 dependencies = [
  "dioxus-core",
  "im-rc",
@@ -1662,30 +1664,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eb9f9e6e233e5c4a35559a617bf40a4ec447db2e84c20b55a6f83167b7e57872"
 
 [[package]]
-name = "proc-macro-error"
-version = "1.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da25490ff9892aab3fcf7c36f08cfb902dd3e71ca0f9f9517bea02a73a5ce38c"
-dependencies = [
- "proc-macro-error-attr",
- "proc-macro2",
- "quote",
- "syn",
- "version_check",
-]
-
-[[package]]
-name = "proc-macro-error-attr"
-version = "1.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1be40180e52ecc98ad80b184934baf3d0d29f979574e439af5a55274b35f869"
-dependencies = [
- "proc-macro2",
- "quote",
- "version_check",
-]
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1835,6 +1813,9 @@ dependencies = [
  "chrono",
  "comrak",
  "dioxus",
+ "dioxus-router",
+ "dioxus-web",
+ "fermi",
  "futures",
  "getrandom",
  "gloo",

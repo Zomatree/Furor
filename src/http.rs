@@ -1,4 +1,4 @@
-use reqwest::{Client, ClientBuilder, header::HeaderMap, RequestBuilder, Method, Response, Error as ReqwestError, multipart::{Form, Part}};
+use reqwest::{Client, ClientBuilder, header::HeaderMap, RequestBuilder, Method, Response, Error as ReqwestError, multipart::Part};
 use std::{
     collections::HashMap,
     rc::Rc,
