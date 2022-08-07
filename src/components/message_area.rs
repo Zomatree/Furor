@@ -1,3 +1,5 @@
+use dioxus::html::input_data::keyboard_types::Code;
+
 use crate::prelude::*;
 
 #[derive(Props, PartialEq)]
@@ -8,6 +10,8 @@ pub struct MessageAreaProps {
 pub fn MessageArea(cx: Scope<MessageAreaProps>) -> Element {
     let message_builder_state = use_read(&cx, MESSAGE_BUILDERS);
     let set_message_builders = use_set(&cx, MESSAGE_BUILDERS);
+    let set_currently_editing = use_set(&cx, CURRENTLY_EDITING);
+    let user_id = &use_read(&cx, USER).as_ref().unwrap().1;
 
     let message_state = use_read(&cx, MESSAGES);
     let channel_state = use_read(&cx, CHANNELS);
@@ -30,6 +34,7 @@ pub fn MessageArea(cx: Scope<MessageAreaProps>) -> Element {
     };
 
     let content_message_builder = message_builder.clone();
+    let edit_message_builder = message_builder.clone();
     let attachments_message_builder = message_builder.clone();
 
     let replies_set_message_builders = set_message_builders.clone();
@@ -125,8 +130,20 @@ pub fn MessageArea(cx: Scope<MessageAreaProps>) -> Element {
             }
             input {
                 style: "flex-grow: 1",
+                onkeydown: move |evt| {
+
+                    if evt.code() == Code::ArrowUp && edit_message_builder.content.as_ref().map(|content| content.is_empty()).unwrap_or(true) {
+                        let mut channel_messages = channel_messages.values().collect::<Vec<_>>();
+                        channel_messages.sort_by(|a, b| b.id.cmp(&a.id));
+
+                        if let Some(last_message) = channel_messages.into_iter().find(|msg| &msg.author == user_id) {
+                            set_currently_editing(Some(last_message.id.clone()))
+                        }
+                    }
+                },
                 oninput: move |evt| {
                     let mut message_builders = message_builder_state.clone();
+
                     message_builders.insert(cx.props.channel_id.clone(), content_message_builder.clone().content(evt.value.clone()));
                     set_message_builders(message_builders);
                 }
