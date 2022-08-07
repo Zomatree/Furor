@@ -127,26 +127,29 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                     }
                 }
             }),
-            button {
-                onclick: move |_| {
-                    modal.push_modal(utils::ActiveModal::DeleteMessage {
-                        channel_id: cx.props.channel_id.clone(),
-                        message_id: cx.props.message_id.clone()
-                    })
+            div {
+                style: "display: flex; flex-direction: row; justify-content: flex-end",
+                button {
+                    onclick: move |_| {
+                        modal.push_modal(utils::ActiveModal::DeleteMessage {
+                            channel_id: cx.props.channel_id.clone(),
+                            message_id: cx.props.message_id.clone()
+                        })
+                    },
+                    "delete"
                 },
-                "delete"
-            },
-            button {
-                onclick: move |_| {
-                    set_message_builder(message_builder.clone().push_reply(types::Reply { id: id.clone(), mention: false }))
+                button {
+                    onclick: move |_| {
+                        set_message_builder(message_builder.clone().push_reply(types::Reply { id: id.clone(), mention: false }))
+                    },
+                    "reply"
                 },
-                "reply"
-            },
-            button {
-                onclick: move |_| {
-                    set_currently_editing(Some(id.clone()))
-                },
-                "edit"
+                button {
+                    onclick: move |_| {
+                        set_currently_editing(Some(id.clone()))
+                    },
+                    "edit"
+                }
             }
         }
     })
