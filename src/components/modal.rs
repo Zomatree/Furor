@@ -13,7 +13,7 @@ impl PartialEq for InnerModalProps {
     }
 }
 
-fn InnerModal<'a>(cx: Scope<'a, InnerModalProps>) -> Element<'a> {
+fn InnerModal(cx: Scope<InnerModalProps>) -> Element {
     let modal = use_modal(&cx);
 
     cx.render(rsx! {
@@ -27,8 +27,8 @@ fn InnerModal<'a>(cx: Scope<'a, InnerModalProps>) -> Element<'a> {
                     button {
                         onclick: move |_| {
                             let callback = callback.borrow_mut().take().unwrap();
-                            log::info!("spawning");
                             cx.spawn(callback());
+
                             modal.pop_modal();
                         },
                         "{name}",
@@ -59,8 +59,54 @@ pub fn Modal(cx: Scope) -> Element {
                                     buttons: vec![
                                         ("Ok", wrap_async(async move || {
                                                 http.delete_message(&channel_id, &message_id).await;
-                                        }))
+                                        })),
+                                        ("Cancel", wrap_async(async move || {}))
                                     ]
+                                }
+                            }
+                        },
+                        ActiveModal::React { channel_id, message_id } => {
+                            let http = http.cloned().unwrap();
+                            let modal = use_modal(&cx);
+                            let emoji = use_state(&cx, String::new);
+
+                            rsx! {
+                                div {
+                                    "React to Message",
+                                    "Enter your emoji",
+                                    input {
+                                        oninput: |evt| {
+                                            emoji.set(evt.value.clone())
+                                        }
+                                    },
+                                    button {
+                                        onclick: {
+                                            let modal = modal.clone();
+
+                                            move |_| {
+                                                to_owned![channel_id, message_id, modal, http];
+
+                                                let emoji = emoji.get().clone();
+
+                                                cx.spawn(async move {
+                                                    http.add_reaction(channel_id, message_id, emoji).await;
+                                                });
+
+                                                modal.pop_modal();
+                                            }
+                                        },
+                                        "React",
+                                    },
+                                    button {
+                                        onclick: {
+                                            let modal = modal.clone();
+
+                                            move |_| {
+                                                modal.pop_modal();
+                                            }
+                                        },
+                                        "Cancel"
+                                    }
                                 }
                             }
                         }

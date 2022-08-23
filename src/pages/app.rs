@@ -47,6 +47,9 @@ pub fn App(cx: Scope) -> Element {
     let dm_channel_state = use_read(&cx, DM_CHANNELS);
     let set_dm_channel_state = use_set(&cx, DM_CHANNELS);
 
+    let emoji_state = use_read(&cx, EMOJIS);
+    let set_emoji_state = use_set(&cx, EMOJIS);
+
     let http_state = use_read(&cx, HTTP);
     let set_http = use_set(&cx, HTTP);
 
@@ -54,6 +57,7 @@ pub fn App(cx: Scope) -> Element {
 
     let revolt_config = use_read(&cx, REVOLT_CONFIG);
     let set_config = use_set(&cx, REVOLT_CONFIG);
+
 
     let ready = use_read(&cx, READY);
     let set_ready = use_set(&cx, READY);
@@ -80,6 +84,8 @@ pub fn App(cx: Scope) -> Element {
             set_typing_state,
             dm_channel_state,
             set_dm_channel_state,
+            emoji_state,
+            set_emoji_state,
             set_ready,
             set_saved_messages
         ];
@@ -104,6 +110,8 @@ pub fn App(cx: Scope) -> Element {
                 set_typing_state.clone(),
                 dm_channel_state.clone(),
                 set_dm_channel_state.clone(),
+                emoji_state.clone(),
+                set_emoji_state.clone(),
                 set_saved_messages.clone(),
                 set_ready.clone()
             ).await;

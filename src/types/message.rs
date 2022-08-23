@@ -1,3 +1,5 @@
+use std::collections::{HashMap, HashSet};
+
 use serde::{Deserialize, Serialize};
 
 use crate::types::{asset::Asset, ulid::ULID, ws::MessageUpdateData};
@@ -146,6 +148,14 @@ pub struct Masquerade {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+pub struct Interactions {
+    pub reactions: Option<HashSet<String>>,
+
+    #[serde(default)]
+    pub restrict_reactions: bool,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct Message {
     #[serde(rename = "_id")]
     pub id: ULID,
@@ -169,7 +179,12 @@ pub struct Message {
     #[serde(default)]
     pub replies: Vec<ULID>,
 
-    pub masquerade: Option<Masquerade>
+    pub masquerade: Option<Masquerade>,
+
+    #[serde(default)]
+    pub reactions: HashMap<String, HashSet<ULID>>,
+
+    pub interactions: Option<Interactions>
 }
 
 impl Message {

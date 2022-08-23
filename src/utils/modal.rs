@@ -7,6 +7,10 @@ pub enum ActiveModal {
     DeleteMessage {
         channel_id: types::ULID,
         message_id: types::ULID
+    },
+    React {
+        channel_id: types::ULID,
+        message_id: types::ULID
     }
 }
 

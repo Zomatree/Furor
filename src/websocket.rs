@@ -23,6 +23,8 @@ pub async fn websocket(
     set_typing_state: FermiSetter<TypingState>,
     mut dm_channel_state: DmChannelState,
     set_dm_channel_state: FermiSetter<DmChannelState>,
+    mut emoji_state: EmojiState,
+    set_emoji_state: FermiSetter<EmojiState>,
     set_saved_messages: FermiSetter<Option<types::SavedMessages>>,
     set_ready: FermiSetter<bool>
 ) {
@@ -69,6 +71,7 @@ pub async fn websocket(
                         users,
                         servers,
                         channels,
+                        emojis
                     } => {
                         for user in users {
                             user_state.insert(user.id.clone(), user);
@@ -115,6 +118,12 @@ pub async fn websocket(
                         set_user_state(user_state.clone());
                         set_server_member_state(server_member_state.clone());
 
+                        for emoji in emojis {
+                            emoji_state.insert(emoji.id.clone(), emoji);
+                        };
+
+                        set_emoji_state(emoji_state.clone());
+
                         ready_tx.take().unwrap().send(()).unwrap();
                     },
                     types::ReceiveWsMessage::Message { message } => {
@@ -152,7 +161,42 @@ pub async fn websocket(
                                 set_message_state(message_state.clone());
                             }
                         }
-                    }
+                    },
+                    types::ReceiveWsMessage::MessageReact { message_id, channel_id, user_id, emoji_id } => {
+                        if let Some(channel) = message_state.get_mut(&channel_id) {
+                            if let Some(message) = channel.get_mut(&message_id) {
+                                message.reactions
+                                    .entry(emoji_id)
+                                    .or_default()
+                                    .insert(user_id);
+
+                                set_message_state(message_state.clone());
+                            }
+                        }
+                    },
+                    types::ReceiveWsMessage::MessageUnreact { message_id, channel_id, user_id, emoji_id } => {
+                        if let Some(channel) = message_state.get_mut(&channel_id) {
+                            if let Some(message) = channel.get_mut(&message_id) {
+                                if let Some(set) = message.reactions.get_mut(&emoji_id) {
+                                    set.remove(&user_id);
+                                    if set.is_empty() {
+                                        message.reactions.remove(&emoji_id);
+                                    }
+                                };
+
+                                set_message_state(message_state.clone());
+                            }
+                        }
+                    },
+                    types::ReceiveWsMessage::MessageRemoveReaction { message_id, channel_id, emoji_id } => {
+                        if let Some(channel) = message_state.get_mut(&channel_id) {
+                            if let Some(message) = channel.get_mut(&message_id) {
+                                message.reactions.remove(&emoji_id);
+
+                                set_message_state(message_state.clone());
+                            }
+                        }
+                    },
                     _ => {
                         log::info!("IGNORED EVENT: {:?}", event);
                     }

@@ -199,6 +199,22 @@ impl HTTPClient {
             .await
             .unwrap();
     }
+
+    pub async fn add_reaction(&self, channel_id: types::ULID, message_id: types::ULID, emoji: String) {
+        self.send(
+            self.put(format!("/channels/{channel_id}/messages/{message_id}/reactions/{emoji}"))
+        )
+            .await
+            .unwrap();
+    }
+
+    pub async fn remove_reaction(&self, channel_id: types::ULID, message_id: types::ULID, emoji: String) {
+        self.send(
+            self.delete(format!("/channels/{channel_id}/messages/{message_id}/reactions/{emoji}"))
+        )
+            .await
+            .unwrap();
+    }
 }
 
 impl PartialEq for HTTPClient {

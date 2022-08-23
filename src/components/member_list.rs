@@ -6,7 +6,7 @@ pub struct MemberListProps {
     pub server_id: types::ULID
 }
 
-pub fn MemberList<'a>(cx: Scope<'a, MemberListProps>) -> Element<'a> {
+pub fn MemberList(cx: Scope<MemberListProps>) -> Element {
     let channel_state = use_read(&cx, CHANNELS);
     let member_state = use_read(&cx, SERVER_MEMBERS);
     let user_state = use_read(&cx, USERS);

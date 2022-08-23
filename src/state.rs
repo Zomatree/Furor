@@ -12,6 +12,7 @@ pub type MessageState = HashMap<types::ULID, HashMap<types::ULID, types::Message
 pub type TypingState = HashMap<types::ULID, HashSet<types::ULID>>;
 pub type DmChannelState = HashSet<types::ULID>;
 pub type MessageBuilderState = HashMap<types::ULID, utils::MessageBuilder>;
+pub type EmojiState = HashMap<types::ULID, types::Emoji>;
 
 pub type FermiSetter<T> = Rc<dyn Fn(T)>;
 
@@ -22,6 +23,7 @@ pub static SERVER_MEMBERS: Atom<ServerMemberState> = |_| HashMap::new();
 pub static MESSAGES: Atom<MessageState> = |_| HashMap::new();
 pub static TYPING: Atom<TypingState> = |_| HashMap::new();
 pub static DM_CHANNELS: Atom<DmChannelState> = |_| HashSet::new();
+pub static EMOJIS: Atom<EmojiState> = |_| HashMap::new();
 
 pub static CURRENT_SERVER: Atom<Option<types::ULID>> = |_| None;
 pub static CURRENT_CHANNEL: Atom<Option<types::ULID>> = |_| None;

@@ -1,4 +1,4 @@
-use crate::{prelude::*, types::RevoltConfig};
+use crate::prelude::*;
 
 mod modal;
 mod login;
@@ -86,8 +86,12 @@ pub fn use_http(cx: &ScopeState) -> &HTTPClient {
     use_read(cx, HTTP).as_ref().unwrap()
 }
 
-pub fn use_config(cx: &ScopeState) -> &RevoltConfig {
+pub fn use_config(cx: &ScopeState) -> &types::RevoltConfig {
     use_read(cx, REVOLT_CONFIG).as_ref().unwrap()
+}
+
+pub fn use_user(cx: &ScopeState) -> &(types::Token, types::ULID) {
+    use_read(cx, USER).as_ref().unwrap()
 }
 
 #[macro_export]

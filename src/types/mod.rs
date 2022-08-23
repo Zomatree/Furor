@@ -9,6 +9,7 @@ pub mod permissions;
 pub mod member;
 pub mod http;
 pub mod ulid;
+pub mod emoji;
 
 pub use ws::*;
 pub use message::*;
@@ -21,3 +22,4 @@ pub use permissions::*;
 pub use member::*;
 pub use self::ulid::*;
 pub use http::*;
+pub use emoji::*;

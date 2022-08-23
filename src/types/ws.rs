@@ -11,7 +11,7 @@ use crate::types::{
     member::MemberId
 };
 
-use super::{role::Role, user::UserStatus, ulid::ULID};
+use super::{role::Role, user::UserStatus, ulid::ULID, emoji::Emoji};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 #[serde(tag = "type")]
@@ -138,7 +138,8 @@ pub enum ReceiveWsMessage {
     Ready {
         users: Vec<User>,
         servers: Vec<Server>,
-        channels: Vec<Channel>
+        channels: Vec<Channel>,
+        emojis: Vec<Emoji>
     },
     Message {
         #[serde(flatten)]
@@ -232,5 +233,22 @@ pub enum ReceiveWsMessage {
         id: ULID,
         #[serde(rename="user")] user_id: ULID,
         status: RelationStatus
+    },
+    MessageReact {
+        #[serde(rename="id")] message_id: ULID,
+        channel_id: ULID,
+        user_id: ULID,
+        emoji_id: String
+    },
+    MessageUnreact {
+        #[serde(rename="id")] message_id: ULID,
+        channel_id: ULID,
+        user_id: ULID,
+        emoji_id: String
+    },
+    MessageRemoveReaction {
+        #[serde(rename="id")] message_id: ULID,
+        channel_id: ULID,
+        emoji_id: String
     }
 }
