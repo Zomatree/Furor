@@ -26,7 +26,7 @@ pub fn MessageReaction(cx: Scope<MessageReactionProps>) -> Element {
                 let channel_id = cx.props.channel_id.clone();
                 let message_id = cx.props.message_id.clone();
                 let emoji = cx.props.emoji.clone();
-                let reacted = cx.props.reacted.clone();
+                let reacted = cx.props.reacted;
 
                 cx.spawn(async move {
                     if reacted {
@@ -44,7 +44,7 @@ pub fn MessageReaction(cx: Scope<MessageReactionProps>) -> Element {
 
 pub fn MessageReactions(cx: Scope<MessageReactionsProps>) -> Element {
     let message_state = use_read(&cx, MESSAGES);
-    let user_id = &use_user(&cx).1;
+    let user_id = use_user(&cx).1;
 
     let message = &message_state[&cx.props.channel_id][&cx.props.message_id];
     let message_reactions = &message.reactions;

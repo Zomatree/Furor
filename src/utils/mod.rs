@@ -90,8 +90,9 @@ pub fn use_config(cx: &ScopeState) -> &types::RevoltConfig {
     use_read(cx, REVOLT_CONFIG).as_ref().unwrap()
 }
 
-pub fn use_user(cx: &ScopeState) -> &(types::Token, types::ULID) {
-    use_read(cx, USER).as_ref().unwrap()
+pub fn use_user(cx: &ScopeState) -> (&types::Token, &types::ULID) {
+    let user = use_read(cx, USER).as_ref().unwrap();
+    (&user.0, &user.1)
 }
 
 #[macro_export]

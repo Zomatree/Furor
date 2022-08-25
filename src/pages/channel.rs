@@ -14,8 +14,14 @@ pub fn Channel(cx: Scope) -> Element {
         components::ServerList {},
         div {
             style: "display: flex; flex-direction: row; flex-grow: 1",
-            components::ChannelList {
-                server_id: server_id.clone()
+            div {
+                style: "display: flex; flex-direction: column; flex-grow: 1",
+                components::ServerHeader {
+                    server_id: server_id.clone(),
+                }
+                components::ChannelList {
+                    server_id: server_id.clone()
+                },
             },
             components::Channel {
                 channel_id: channel_id

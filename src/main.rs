@@ -47,7 +47,7 @@ mod tests {
 
         print!("{starter} {value:?}");
 
-        match &value {
+        match value {
             NodeValue::Text(bytes) => println!(" '{}'", std::str::from_utf8(bytes).unwrap()),
             NodeValue::Link(NodeLink { url, title }) => {
                 if !url.is_empty() {

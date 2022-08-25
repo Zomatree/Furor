@@ -52,16 +52,16 @@ pub fn DirectMessageList(cx: Scope) -> Element {
                 })
                 .map(|channel| {
                     let match_channel = channel.clone();
+                    let id = match channel {
+                        Channel::Dm(dm) => &dm.id,
+                        Channel::Group(group) => &group.id
+                    };
 
                     rsx!{
                         button {
+                            key: "{id}",
                             style: "gap: 8px; text-align: start;",
                             onclick: move |_| {
-                                let id = match channel {
-                                    Channel::Dm(dm) => &dm.id,
-                                    Channel::Group(group) => &group.id
-                                };
-
                                 router.push_route(&format!("/channel/{id}"), None, None);
                             },
                             match match_channel {
