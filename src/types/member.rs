@@ -18,3 +18,17 @@ pub struct Member {
     #[serde(default)]
     pub roles: Vec<String>
 }
+
+impl Member {
+    pub fn from_ids(server_id: ULID, user_id: ULID) -> Self {
+        Self {
+            id: MemberId {
+                server: server_id,
+                user: user_id
+            },
+            nickname: None,
+            avatar: None,
+            roles: Vec::new()
+        }
+    }
+}

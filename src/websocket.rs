@@ -197,6 +197,18 @@ pub async fn websocket(
                             }
                         }
                     },
+                    types::ReceiveWsMessage::ServerMemberJoin { server_id, user_id } => {
+                        if !user_state.contains_key(&user_id) {
+                            let user = http.fetch_user(&user_id).await;
+                            user_state.insert(user_id.clone(), user);
+                            set_user_state(user_state.clone());
+                        };
+
+                        let server = &mut server_member_state[&server_id];
+
+                        server.insert(user_id.clone(), types::Member::from_ids(server_id, user_id));
+                        set_server_member_state(server_member_state.clone());
+                    },
                     _ => {
                         log::info!("IGNORED EVENT: {:?}", event);
                     }

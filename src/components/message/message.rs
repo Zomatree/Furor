@@ -1,12 +1,12 @@
 use crate::prelude::*;
 
 #[derive(Props, PartialEq)]
-pub struct MessageProps {
-    pub message_id: types::ULID,
-    pub channel_id: types::ULID
+pub struct MessageProps<'a> {
+    pub message_id: &'a types::ULID,
+    pub channel_id: &'a types::ULID
 }
 
-pub fn Message(cx: Scope<MessageProps>) -> Element {
+pub fn Message<'a>(cx: Scope<'a, MessageProps<'a>>) -> Element<'a> {
     let message_state = use_read(&cx, MESSAGES);
     let channel_state = use_read(&cx, CHANNELS);
     let server_members = use_read(&cx, SERVER_MEMBERS);
@@ -21,8 +21,8 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
     let modal = utils::use_modal(&cx);
 
     let message = message_state
-        .get(&cx.props.channel_id)?
-        .get(&cx.props.message_id)?;
+        .get(cx.props.channel_id)?
+        .get(cx.props.message_id)?;
 
     let types::Message { content, author, attachments, channel, masquerade, replies, edited, id, .. } = message;
 
@@ -31,13 +31,13 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
     let content = content.clone().unwrap_or_default();
     let created_at = cx.use_hook(|| format_datetime(&id.timestamp()));  // only needs to be calculated once
 
-    let message_builder = match message_builder_state.get(&cx.props.channel_id) {
+    let message_builder = match message_builder_state.get(cx.props.channel_id) {
         Some(message_builder) => message_builder.clone(),
         None => {
             let message_builder = utils::MessageBuilder::new();
             let mut message_builders = message_builder_state.clone();
             message_builders.insert(cx.props.channel_id.clone(), message_builder);
-            message_builders.get(&cx.props.channel_id).unwrap().clone()
+            message_builders.get(cx.props.channel_id).unwrap().clone()
         }
     };
 
@@ -64,9 +64,9 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                                 style: "gap: 8px; min-width: 8px; display: flex; margin-inline: 30px 12px; font-size: 0.8em",
                                 key: "{reply}",
                                 components::Reply {
-                                    message_id: reply.clone(),
-                                    channel_id: cx.props.channel_id.clone(),
-                                    message_mentions: replies.clone()
+                                    message_id: reply,
+                                    channel_id: cx.props.channel_id,
+                                    message_mentions: replies
                                 }
                             }
                         }
@@ -103,8 +103,8 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                     if Some(id) == currently_editing {
                         rsx! {
                             components::MessageEditor {
-                                message_id: id.clone(),
-                                channel_id: channel.clone(),
+                                message_id: id,
+                                channel_id: channel,
                                 initial_text: content
                             }
                         }
@@ -128,8 +128,8 @@ pub fn Message(cx: Scope<MessageProps>) -> Element {
                 }
             }),
             components::MessageReactions {
-                channel_id: cx.props.channel_id.clone(),
-                message_id: cx.props.message_id.clone()
+                channel_id: cx.props.channel_id,
+                message_id: cx.props.message_id
             },
             div {
                 style: "display: flex; flex-direction: row; justify-content: flex-end",

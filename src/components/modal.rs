@@ -89,7 +89,9 @@ pub fn Modal(cx: Scope) -> Element {
                                                 let emoji = emoji.get().clone();
 
                                                 cx.spawn(async move {
-                                                    http.add_reaction(channel_id, message_id, emoji).await;
+                                                    //move_variables![channel_id, message_id, emoji];
+
+                                                    http.add_reaction(&channel_id, &message_id, &emoji).await;
                                                 });
 
                                                 modal.pop_modal();

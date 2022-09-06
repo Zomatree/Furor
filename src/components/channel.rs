@@ -1,11 +1,11 @@
 use crate::prelude::*;
 
 #[derive(Props, PartialEq)]
-pub struct ChannelProps {
-    pub channel_id: types::ULID,
+pub struct ChannelProps<'a> {
+    pub channel_id: &'a types::ULID,
 }
 
-pub fn Channel(cx: Scope<ChannelProps>) -> Element {
+pub fn Channel<'a>(cx: Scope<'a, ChannelProps<'a>>) -> Element<'a> {
     let channel_state = use_read(&cx, CHANNELS);
     let user_state = use_read(&cx, USERS);
 
@@ -27,14 +27,14 @@ pub fn Channel(cx: Scope<ChannelProps>) -> Element {
                 "{name}"
             }
             components::ChannelMessages {
-                channel_id: cx.props.channel_id.clone(),
+                channel_id: cx.props.channel_id,
             },
             components::Typing {
-                channel_id: cx.props.channel_id.clone(),
+                channel_id: cx.props.channel_id,
 
             }
             components::MessageArea {
-                channel_id: cx.props.channel_id.clone(),
+                channel_id: cx.props.channel_id,
             }
         }
     })

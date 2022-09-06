@@ -2,21 +2,21 @@ use crate::prelude::*;
 
 
 #[derive(Props, PartialEq)]
-pub struct MessageReactionsProps {
-    message_id: types::ULID,
-    channel_id: types::ULID
+pub struct MessageReactionsProps<'a> {
+    message_id: &'a types::ULID,
+    channel_id: &'a types::ULID
 }
 
 #[derive(Props, PartialEq)]
-pub struct MessageReactionProps {
-    channel_id: types::ULID,
-    message_id: types::ULID,
+pub struct MessageReactionProps<'a> {
+    channel_id: &'a types::ULID,
+    message_id: &'a types::ULID,
     emoji: String,
     count: usize,
     reacted: bool,
 }
 
-pub fn MessageReaction(cx: Scope<MessageReactionProps>) -> Element {
+pub fn MessageReaction<'a>(cx: Scope<'a, MessageReactionProps<'a>>) -> Element<'a> {
     let http = use_http(&cx);
 
     cx.render(rsx! {
@@ -30,9 +30,9 @@ pub fn MessageReaction(cx: Scope<MessageReactionProps>) -> Element {
 
                 cx.spawn(async move {
                     if reacted {
-                        http.remove_reaction(channel_id, message_id, emoji).await;
+                        http.remove_reaction(&channel_id, &message_id, &emoji).await;
                     } else {
-                        http.add_reaction(channel_id, message_id, emoji).await;
+                        http.add_reaction(&channel_id, &message_id, &emoji).await;
                     }
                 });
             },
@@ -42,11 +42,11 @@ pub fn MessageReaction(cx: Scope<MessageReactionProps>) -> Element {
     })
 }
 
-pub fn MessageReactions(cx: Scope<MessageReactionsProps>) -> Element {
+pub fn MessageReactions<'a>(cx: Scope<'a, MessageReactionsProps<'a>>) -> Element<'a> {
     let message_state = use_read(&cx, MESSAGES);
     let user_id = use_user(&cx).1;
 
-    let message = &message_state[&cx.props.channel_id][&cx.props.message_id];
+    let message = &message_state[cx.props.channel_id][cx.props.message_id];
     let message_reactions = &message.reactions;
 
     cx.render(rsx! {
@@ -55,8 +55,8 @@ pub fn MessageReactions(cx: Scope<MessageReactionsProps>) -> Element {
             message_reactions.iter().map(|(emoji, users)| rsx! {
                 MessageReaction {
                     emoji: emoji.clone(),
-                    channel_id: cx.props.channel_id.clone(),
-                    message_id: cx.props.message_id.clone(),
+                    channel_id: cx.props.channel_id,
+                    message_id: cx.props.message_id,
                     count: users.len(),
                     reacted: users.contains(user_id)
                 }

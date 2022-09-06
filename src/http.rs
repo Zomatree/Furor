@@ -200,7 +200,7 @@ impl HTTPClient {
             .unwrap();
     }
 
-    pub async fn add_reaction(&self, channel_id: types::ULID, message_id: types::ULID, emoji: String) {
+    pub async fn add_reaction(&self, channel_id: &types::ULID, message_id: &types::ULID, emoji: &str) {
         self.send(
             self.put(format!("/channels/{channel_id}/messages/{message_id}/reactions/{emoji}"))
         )
@@ -208,12 +208,23 @@ impl HTTPClient {
             .unwrap();
     }
 
-    pub async fn remove_reaction(&self, channel_id: types::ULID, message_id: types::ULID, emoji: String) {
+    pub async fn remove_reaction(&self, channel_id: &types::ULID, message_id: &types::ULID, emoji: &str) {
         self.send(
             self.delete(format!("/channels/{channel_id}/messages/{message_id}/reactions/{emoji}"))
         )
             .await
             .unwrap();
+    }
+
+    pub async fn fetch_user(&self, user_id: &types::ULID) -> types::User {
+        self.send(
+            self.get(format!("/users/{user_id}"))
+        )
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap()
     }
 }
 

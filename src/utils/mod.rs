@@ -8,6 +8,7 @@ mod files;
 mod context_menu;
 mod r#async;
 
+use dioxus::core::exports::bumpalo::Bump;
 pub use modal::*;
 pub use login::*;
 pub use message::*;
@@ -93,6 +94,11 @@ pub fn use_config(cx: &ScopeState) -> &types::RevoltConfig {
 pub fn use_user(cx: &ScopeState) -> (&types::Token, &types::ULID) {
     let user = use_read(cx, USER).as_ref().unwrap();
     (&user.0, &user.1)
+}
+
+pub fn use_alloc(cx: &ScopeState) -> &Bump {
+    let factory = NodeFactory::new(cx);
+    factory.bump()
 }
 
 #[macro_export]

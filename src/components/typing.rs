@@ -1,11 +1,11 @@
 use crate::prelude::*;
 
 #[derive(Props, PartialEq)]
-pub struct TypingProps {
-    channel_id: types::ULID
+pub struct TypingProps<'a> {
+    channel_id: &'a types::ULID
 }
 
-pub fn Typing(cx: Scope<TypingProps>) -> Element {
+pub fn Typing<'a>(cx: Scope<'a, TypingProps<'a>>) -> Element<'a> {
     let typing_state = use_read(&cx, TYPING);
     let user_state = use_read(&cx, USERS);
     let server_member_state = use_read(&cx, SERVER_MEMBERS);
@@ -13,7 +13,7 @@ pub fn Typing(cx: Scope<TypingProps>) -> Element {
     let revolt_config = use_config(&cx);
 
     rsx!(cx, div {
-        typing_state.get(&cx.props.channel_id).map(|currently_typing| {
+        typing_state.get(cx.props.channel_id).map(|currently_typing| {
             if currently_typing.is_empty() {
                 return rsx! { None::<()> }
             };
@@ -23,7 +23,7 @@ pub fn Typing(cx: Scope<TypingProps>) -> Element {
 
             for user_id in currently_typing {
                 let user = &user_state[user_id];
-                let (username, avatar) = get_username_avatar(channel_state, server_member_state, revolt_config, user, &None, Some(&cx.props.channel_id));
+                let (username, avatar) = get_username_avatar(channel_state, server_member_state, revolt_config, user, &None, Some(cx.props.channel_id));
 
                 names.push(username);
                 avatars.push(avatar);

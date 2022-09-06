@@ -1,14 +1,14 @@
 use crate::prelude::*;
 
 #[derive(Props, PartialEq, Clone)]
-pub struct ReplyProps {
-    pub message_id: types::ULID,
-    pub channel_id: types::ULID,
-    pub message_mentions: Vec<types::ULID>,
+pub struct ReplyProps<'a> {
+    pub message_id: &'a types::ULID,
+    pub channel_id: &'a types::ULID,
+    pub message_mentions: &'a Vec<types::ULID>,
 }
 
-pub fn Reply(cx: Scope<ReplyProps>) -> Element {
-    let http = use_read(&cx, HTTP).clone().unwrap();
+pub fn Reply<'a>(cx: Scope<'a, ReplyProps<'a>>) -> Element<'a> {
+    let http = use_http(&cx);
     let channels_state = use_read(&cx, CHANNELS);
     let server_members_state = use_read(&cx, SERVER_MEMBERS);
     let revolt_config = use_config(&cx);
@@ -47,7 +47,7 @@ pub fn Reply(cx: Scope<ReplyProps>) -> Element {
     cx.render(match reply.get() {
         Some(message) => {
             let message_id = &message.id;
-            let (username, avatar) = get_username_avatar(channels_state, server_members_state, revolt_config, &user_state[&message.author], &message.masquerade, Some(&cx.props.channel_id));
+            let (username, avatar) = get_username_avatar(channels_state, server_members_state, revolt_config, &user_state[&message.author], &message.masquerade, Some(cx.props.channel_id));
             let content = message.content.clone().unwrap_or_default();
 
             let username = if cx.props.message_mentions.contains(&message.author) {

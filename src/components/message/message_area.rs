@@ -3,11 +3,11 @@ use dioxus::html::input_data::keyboard_types::Code;
 use crate::prelude::*;
 
 #[derive(Props, PartialEq)]
-pub struct MessageAreaProps {
-    channel_id: types::ULID
+pub struct MessageAreaProps<'a> {
+    channel_id: &'a types::ULID
 }
 
-pub fn MessageArea(cx: Scope<MessageAreaProps>) -> Element {
+pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
     let message_builder_state = use_read(&cx, MESSAGE_BUILDERS);
     let set_message_builders = use_set(&cx, MESSAGE_BUILDERS);
     let set_currently_editing = use_set(&cx, CURRENTLY_EDITING);
@@ -21,15 +21,15 @@ pub fn MessageArea(cx: Scope<MessageAreaProps>) -> Element {
 
     let http = use_http(&cx);
 
-    let channel_messages = message_state.get(&cx.props.channel_id).cloned().unwrap_or_default();
+    let channel_messages = message_state.get(cx.props.channel_id).cloned().unwrap_or_default();
 
-    let message_builder = match message_builder_state.get(&cx.props.channel_id) {
+    let message_builder = match message_builder_state.get(cx.props.channel_id) {
         Some(message_builder) => message_builder.clone(),
         None => {
             let message_builder = utils::MessageBuilder::new();
             let mut message_builders = message_builder_state.clone();
             message_builders.insert(cx.props.channel_id.clone(), message_builder);
-            message_builders.get(&cx.props.channel_id).unwrap().clone()
+            message_builders.get(cx.props.channel_id).unwrap().clone()
         }
     };
 
@@ -64,7 +64,7 @@ pub fn MessageArea(cx: Scope<MessageAreaProps>) -> Element {
                 let message = channel_messages.get(&reply.id).unwrap();
                 let user = users.get(&message.author).unwrap();
 
-                let (username, avatar) = utils::get_username_avatar(channel_state, member_state, revolt_config, user, &message.masquerade, Some(&cx.props.channel_id));
+                let (username, avatar) = utils::get_username_avatar(channel_state, member_state, revolt_config, user, &message.masquerade, Some(cx.props.channel_id));
                 rsx! {
                     div {
                         "Replying to "

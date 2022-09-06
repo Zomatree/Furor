@@ -1,11 +1,11 @@
 use crate::prelude::*;
 
 #[derive(Props, PartialEq)]
-pub struct ChannelListProps {
-    server_id: types::ULID
+pub struct ChannelListProps<'a> {
+    server_id: &'a types::ULID
 }
 
-pub fn ChannelList(cx: Scope<ChannelListProps>) -> Element {
+pub fn ChannelList<'a>(cx: Scope<'a, ChannelListProps<'a>>) -> Element<'a> {
     let server_state = use_read(&cx, SERVERS);
     let channel_state = use_read(&cx, CHANNELS);
     let set_channel = use_set(&cx, CURRENT_CHANNEL);
@@ -13,7 +13,7 @@ pub fn ChannelList(cx: Scope<ChannelListProps>) -> Element {
 
     rsx!(cx, div {
         style: "display: flex; flex-direction: column; width: 232px",
-        server_state[&cx.props.server_id]
+        server_state[cx.props.server_id]
             .categories
             .iter()
             .map(|category| {

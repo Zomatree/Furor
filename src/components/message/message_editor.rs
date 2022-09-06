@@ -2,13 +2,13 @@ use crate::prelude::*;
 
 
 #[derive(Props, PartialEq)]
-pub struct MessageEditorProps {
-    message_id: types::ULID,
-    channel_id: types::ULID,
+pub struct MessageEditorProps<'a> {
+    message_id: &'a types::ULID,
+    channel_id: &'a types::ULID,
     initial_text: String
 }
 
-pub fn MessageEditor(cx: Scope<MessageEditorProps>) -> Element {
+pub fn MessageEditor<'a>(cx: Scope<'a, MessageEditorProps<'a>>) -> Element<'a> {
     let http = use_http(&cx);
     let set_currently_editing = use_set(&cx, CURRENTLY_EDITING);
     let content = use_state(&cx, || cx.props.initial_text.clone());
