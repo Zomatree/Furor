@@ -1,11 +1,11 @@
 [application]
-name = "revolt-client"
+name = "Furor"
 default_platform = "web"
 out_dir = "dist"
 asset_dir = "public"
 
 [web.app]
-title = "dioxus | ⛺"
+title = "Furor"
 
 [web.watcher]
 watch_path = ["src"]
