@@ -769,6 +769,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "furor"
+version = "0.1.0"
+dependencies = [
+ "async-recursion",
+ "async-std",
+ "chrono",
+ "comrak",
+ "dioxus",
+ "dioxus-router",
+ "dioxus-web",
+ "fermi",
+ "futures",
+ "getrandom",
+ "gloo",
+ "im-rc",
+ "js-sys",
+ "log",
+ "lru-cache",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "ulid",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "wasm-logger",
+ "web-sys",
+ "ws_stream_wasm",
+]
+
+[[package]]
 name = "futures"
 version = "0.3.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1802,36 +1832,6 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "winreg",
-]
-
-[[package]]
-name = "revolt-client"
-version = "0.1.0"
-dependencies = [
- "async-recursion",
- "async-std",
- "chrono",
- "comrak",
- "dioxus",
- "dioxus-router",
- "dioxus-web",
- "fermi",
- "futures",
- "getrandom",
- "gloo",
- "im-rc",
- "js-sys",
- "log",
- "lru-cache",
- "reqwest",
- "serde",
- "serde_json",
- "ulid",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "wasm-logger",
- "web-sys",
- "ws_stream_wasm",
 ]
 
 [[package]]

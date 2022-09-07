@@ -1,5 +1,5 @@
 [package]
-name = "revolt-client"
+name = "furor"
 version = "0.1.0"
 edition = "2021"
 
@@ -27,5 +27,5 @@ js-sys = "0.3.57"
 wasm-bindgen = "0.2.80"
 async-recursion = "1.0.0"
 comrak = "0.13.2"
-web-sys = { version = "*", features = ["Document", "Window", "Element", "HtmlElement", "FileList", "Node", "Blob"] }
+web-sys = { version = "*", features = ["Document", "Window", "Element", "HtmlElement", "FileList", "Node", "Blob", "IntersectionObserver", "IntersectionObserverEntry", "IntersectionObserverInit"] }
 wasm-bindgen-futures = "0.4.32"
