@@ -3,12 +3,19 @@
 <head>
   <title>{app_title}</title>
   <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Type" name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
   <meta charset="UTF-8" />
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+
   {style_include}
+  <style>
+    * {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    </style>
 </head>
-<body>
-  <div id="main"></div>
+<body style="margin: 0px; width: 100vw; height: 100vh">
+  <div id="main" style="width: 100vw; height: 100vh"></div>
   <script type="module">
     import init from "/{base_path}/assets/dioxus/{app_name}.js";
     init("/{base_path}/assets/dioxus/{app_name}_bg.wasm").then(wasm => {
