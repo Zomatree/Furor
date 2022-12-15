@@ -14,7 +14,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see https://www.gnu.org/licenses/. */
 
 
-use dioxus::{prelude::*, core::to_owned};
+use dioxus::prelude::*;
 use crate::{prelude::*, websocket::websocket};
 use gloo::storage::{LocalStorage, Storage};
 
@@ -34,7 +34,9 @@ macro_rules! loading_ready {
 
 
 pub fn App(cx: Scope) -> Element {
-    let set_user = use_set(&cx, USER);
+    use_init_atom_root(cx);
+
+    let set_user = use_set(cx, USER);
 
     cx.use_hook(|| {
         let user = LocalStorage::get::<(types::Token, types::ULID)>("user").ok();
@@ -42,43 +44,42 @@ pub fn App(cx: Scope) -> Element {
         set_user(user);
     });
 
-    let user_state = use_read(&cx, USERS);
-    let set_user_state = use_set(&cx, USERS);
+    let user_state = use_read(cx, USERS);
+    let set_user_state = use_set(cx, USERS);
 
-    let server_state = use_read(&cx, SERVERS);
-    let set_server_state = use_set(&cx, SERVERS);
+    let server_state = use_read(cx, SERVERS);
+    let set_server_state = use_set(cx, SERVERS);
 
-    let channel_state = use_read(&cx, CHANNELS);
-    let set_channel_state = use_set(&cx, CHANNELS);
+    let channel_state = use_read(cx, CHANNELS);
+    let set_channel_state = use_set(cx, CHANNELS);
 
-    let server_member_state = use_read(&cx, SERVER_MEMBERS);
-    let set_server_member_state = use_set(&cx, SERVER_MEMBERS);
+    let server_member_state = use_read(cx, SERVER_MEMBERS);
+    let set_server_member_state = use_set(cx, SERVER_MEMBERS);
 
-    let message_state = use_read(&cx, MESSAGES);
-    let set_message_state = use_set(&cx, MESSAGES);
+    let message_state = use_read(cx, MESSAGES);
+    let set_message_state = use_set(cx, MESSAGES);
 
-    let typing_state = use_read(&cx, TYPING);
-    let set_typing_state = use_set(&cx, TYPING);
+    let typing_state = use_read(cx, TYPING);
+    let set_typing_state = use_set(cx, TYPING);
 
-    let dm_channel_state = use_read(&cx, DM_CHANNELS);
-    let set_dm_channel_state = use_set(&cx, DM_CHANNELS);
+    let dm_channel_state = use_read(cx, DM_CHANNELS);
+    let set_dm_channel_state = use_set(cx, DM_CHANNELS);
 
-    let emoji_state = use_read(&cx, EMOJIS);
-    let set_emoji_state = use_set(&cx, EMOJIS);
+    let emoji_state = use_read(cx, EMOJIS);
+    let set_emoji_state = use_set(cx, EMOJIS);
 
-    let http_state = use_read(&cx, HTTP);
-    let set_http = use_set(&cx, HTTP);
+    let http_state = use_read(cx, HTTP);
+    let set_http = use_set(cx, HTTP);
 
-    let user = use_read(&cx, USER);
+    let user = use_read(cx, USER);
 
-    let revolt_config = use_read(&cx, REVOLT_CONFIG);
-    let set_config = use_set(&cx, REVOLT_CONFIG);
+    let revolt_config = use_read(cx, REVOLT_CONFIG);
+    let set_config = use_set(cx, REVOLT_CONFIG);
 
+    let ready = use_read(cx, READY);
+    let set_ready = use_set(cx, READY);
 
-    let ready = use_read(&cx, READY);
-    let set_ready = use_set(&cx, READY);
-
-    let set_saved_messages = use_set(&cx, SAVED_MESSAGES);
+    let set_saved_messages = use_set(cx, SAVED_MESSAGES);
 
     log::info!("{user:?} {revolt_config:?}");
 
@@ -150,16 +151,16 @@ pub fn App(cx: Scope) -> Element {
         })
     };
 
-    rsx!(cx, Router {
+    cx.render(rsx!(Router {
         components::ContextMenu {},
         components::Modal {},
         Route {
-            to: "/login",
-            pages::Login {}
+            to: "/",
+            pages::Home {}
         },
         Route {
-            to: "/",
-            loading_ready!(ready, pages::Home)
+            to: "/login",
+            pages::Login {}
         },
         Route {
             to: "/server/:server_id/channel/:channel_id",
@@ -173,5 +174,5 @@ pub fn App(cx: Scope) -> Element {
             to: "/saved_messages",
             loading_ready!(ready, pages::SavedMessages)
         }
-    })
+    }))
 }

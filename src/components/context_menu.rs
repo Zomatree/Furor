@@ -28,7 +28,7 @@ impl PartialEq for ContextMenuInnerProps {
 }
 
 fn ContextMenuInner(cx: Scope<ContextMenuInnerProps>) -> Element {
-    let context_menu = use_context_menu(&cx);
+    let context_menu = use_context_menu(cx);
 
     cx.render(rsx! {
         cx.props.buttons.iter().map(|(text, cell)| {
@@ -49,8 +49,8 @@ fn ContextMenuInner(cx: Scope<ContextMenuInnerProps>) -> Element {
 }
 
 pub fn ContextMenu(cx: Scope) -> Element {
-    let context_menu = use_context_menu(&cx);
-    let modal = use_modal(&cx);
+    let context_menu = use_context_menu(cx);
+    let modal = use_modal(cx);
 
     cx.render(rsx! {
         context_menu.get().as_ref().map(|context_menu| {

@@ -30,7 +30,7 @@ impl PartialEq for InnerModalProps {
 }
 
 fn InnerModal(cx: Scope<InnerModalProps>) -> Element {
-    let modal = use_modal(&cx);
+    let modal = use_modal(cx);
 
     cx.render(rsx! {
         div {
@@ -56,8 +56,8 @@ fn InnerModal(cx: Scope<InnerModalProps>) -> Element {
 }
 
 pub fn Modal(cx: Scope) -> Element {
-    let modals = use_read(&cx, MODALS);
-    let http = use_read(&cx, HTTP).as_ref();
+    let modals = use_read(cx, MODALS);
+    let http = use_read(cx, HTTP).as_ref();
 
     cx.render(match modals.as_slice() {
         &[] => rsx! { None::<()> },
@@ -83,8 +83,8 @@ pub fn Modal(cx: Scope) -> Element {
                         },
                         ActiveModal::React { channel_id, message_id } => {
                             let http = http.cloned().unwrap();
-                            let modal = use_modal(&cx);
-                            let emoji = use_state(&cx, String::new);
+                            let modal = use_modal(cx);
+                            let emoji = use_state(cx, String::new);
 
                             rsx! {
                                 div {

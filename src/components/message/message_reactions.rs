@@ -33,7 +33,7 @@ pub struct MessageReactionProps<'a> {
 }
 
 pub fn MessageReaction<'a>(cx: Scope<'a, MessageReactionProps<'a>>) -> Element<'a> {
-    let http = use_http(&cx);
+    let http = use_http(cx);
 
     cx.render(rsx! {
         button {
@@ -59,8 +59,8 @@ pub fn MessageReaction<'a>(cx: Scope<'a, MessageReactionProps<'a>>) -> Element<'
 }
 
 pub fn MessageReactions<'a>(cx: Scope<'a, MessageReactionsProps<'a>>) -> Element<'a> {
-    let message_state = use_read(&cx, MESSAGES);
-    let user_id = use_user(&cx).1;
+    let message_state = use_read(cx, MESSAGES);
+    let user_id = use_user(cx).1;
 
     let message = &message_state[cx.props.channel_id][cx.props.message_id];
     let message_reactions = &message.reactions;

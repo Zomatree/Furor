@@ -46,7 +46,7 @@ mod test {
     use crate::prelude::*;
 
     pub fn test(cx: Scope) -> Element {
-        let data = use_state(&cx, Vec::<u8>::new);
+        let data = use_state(cx, Vec::<u8>::new);
 
         cx.render(rsx! {
             components::Lazy {

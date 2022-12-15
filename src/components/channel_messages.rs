@@ -24,7 +24,7 @@ pub struct ChannelProps<'a> {
 }
 
 pub fn ChannelMessages<'a>(cx: Scope<'a, ChannelProps<'a>>) -> Element<'a> {
-    let message_state = use_read(&cx, MESSAGES);
+    let message_state = use_read(cx, MESSAGES);
     let default = cx.use_hook(HashMap::new);
 
     let mut messages = message_state

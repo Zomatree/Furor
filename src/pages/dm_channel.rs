@@ -18,14 +18,14 @@ use crate::prelude::*;
 
 
 pub fn DmChannel(cx: Scope) -> Element {
-    redirect_to_login(&cx);
+    redirect_to_login(cx);
 
-    let route = use_route(&cx);
-    let bump = use_alloc(&cx);
+    let route = use_route(cx);
+    let bump = use_alloc(cx);
 
     let channel_id = bump.alloc(route.parse_segment::<types::ULID>("channel_id").unwrap().unwrap());
 
-    rsx!(cx, div {
+    cx.render(rsx!(div {
         style: "width: 100%; height: 100%; display: flex; flex-direction: row",
         components::ServerList {},
         div {
@@ -35,5 +35,5 @@ pub fn DmChannel(cx: Scope) -> Element {
                 channel_id: channel_id,
             }
         }
-    })
+    }))
 }

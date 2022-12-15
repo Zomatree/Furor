@@ -20,6 +20,7 @@ along with this program.  If not, see https://www.gnu.org/licenses/. */
 #![feature(trait_alias)]
 #![feature(unboxed_closures)]
 #![feature(fn_traits)]
+#![feature(tuple_trait)]
 #![allow(non_snake_case)]
 #![allow(clippy::derive_partial_eq_without_eq)]
 
@@ -37,7 +38,6 @@ pub mod prelude {
     pub use dioxus_web::*;
     pub use fermi::prelude::*;
     pub use dioxus_router::*;
-    pub use dioxus::core::to_owned;
     pub use crate::*;
     pub use crate::types;
     pub use crate::utils::*;

@@ -17,7 +17,7 @@ along with this program.  If not, see https://www.gnu.org/licenses/. */
 // please dont read this code
 
 use futures::Future;
-use std::{pin::Pin, cell::RefCell, marker::PhantomData};
+use std::{pin::Pin, cell::RefCell, marker::{PhantomData, Tuple}};
 
 // BoxFuture from futures requires Send however we are in a single threaded env so we dont want Send
 
@@ -27,14 +27,14 @@ pub type TakenAsyncFunc<Args, O> = Take<Box<dyn FnOnce<Args, Output=BoxFuture<O>
 
 struct Wrapper<Args, O, F, Fut>(F, PhantomData<(Args, O, Fut)>)
 where
-    Args: 'static,
+    Args: Tuple + 'static,
     O: 'static,
     F: FnOnce<Args, Output=Fut> + 'static,
     Fut: Future<Output=O> + 'static;
 
 impl<Args, O, F, Fut> FnOnce<Args> for Wrapper<Args, O, F, Fut>
 where
-    Args: 'static,
+    Args: Tuple + 'static,
     O: 'static,
     F: FnOnce<Args, Output=Fut> + 'static,
     Fut: Future<Output=O> + 'static
@@ -48,7 +48,7 @@ where
 
 pub fn wrap_async<Args, F, Fut, O>(func: F) -> TakenAsyncFunc<Args, O>
 where
-    Args: 'static,
+    Args: Tuple + 'static,
     O: 'static,
     F: FnOnce<Args, Output=Fut> + 'static,
     Fut: Future<Output=O> + 'static

@@ -24,18 +24,18 @@ pub struct MessageAreaProps<'a> {
 }
 
 pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
-    let message_builder_state = use_read(&cx, MESSAGE_BUILDERS);
-    let set_message_builders = use_set(&cx, MESSAGE_BUILDERS);
-    let set_currently_editing = use_set(&cx, CURRENTLY_EDITING);
-    let user_id = &use_read(&cx, USER).as_ref().unwrap().1;
+    let message_builder_state = use_read(cx, MESSAGE_BUILDERS);
+    let set_message_builders = use_set(cx, MESSAGE_BUILDERS);
+    let set_currently_editing = use_set(cx, CURRENTLY_EDITING);
+    let user_id = &use_read(cx, USER).as_ref().unwrap().1;
 
-    let message_state = use_read(&cx, MESSAGES);
-    let channel_state = use_read(&cx, CHANNELS);
-    let member_state = use_read(&cx, SERVER_MEMBERS);
-    let revolt_config = use_config(&cx);
-    let users = use_read(&cx, USERS);
+    let message_state = use_read(cx, MESSAGES);
+    let channel_state = use_read(cx, CHANNELS);
+    let member_state = use_read(cx, SERVER_MEMBERS);
+    let revolt_config = use_config(cx);
+    let users = use_read(cx, USERS);
 
-    let http = use_http(&cx);
+    let http = use_http(cx);
 
     let channel_messages = message_state.get(cx.props.channel_id).cloned().unwrap_or_default();
 
@@ -56,7 +56,7 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
     let replies_set_message_builders = set_message_builders.clone();
     let attachment_set_message_builder = set_message_builders.clone();
 
-    rsx!(cx, div {
+    cx.render(rsx!(div {
         style: "display: flex; flex-direction: column",
         div {
             style: "display: flex; flex-direction: column",
@@ -88,7 +88,7 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
                             src: avatar
                         },
                         "{username}",
-                        message.content.as_ref().map(|content| rsx! { [content.as_str()] }),
+                        message.content.as_ref().map(|content| rsx! {content.as_str() }),
 
                         button {
                             onclick: move |_| {
@@ -104,9 +104,9 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
                                 mention_set_message_builders(message_builders);
                             },
                             if reply.mention {
-                                ["@ on"]
+                                "@ on"
                             } else {
-                                ["@ off"]
+                                "@ off"
                             },
                         },
                         button {
@@ -180,5 +180,5 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
                 "Send"
             }
         }
-    })
+    }))
 }

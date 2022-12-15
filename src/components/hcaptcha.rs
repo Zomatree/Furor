@@ -36,8 +36,7 @@ pub fn HCaptcha<F: FnOnce(String) + 'static>(cx: Scope<HCaptchaProps<F>>) -> Ele
     let sitekey = &cx.props.sitekey;
 
     cx.use_hook(|| {
-        let oncomplete = &cx.props.complete_callback;
-        let owned = oncomplete.lock().unwrap().take().unwrap();
+        let owned = cx.props.complete_callback.lock().unwrap().take().unwrap();
 
         let closure = Closure::once_into_js(move || {
             let token = eval("hcaptcha.getResponse(globalThis.hcaptcha_id)").unwrap().as_string().unwrap();
@@ -47,12 +46,12 @@ pub fn HCaptcha<F: FnOnce(String) + 'static>(cx: Scope<HCaptchaProps<F>>) -> Ele
         Reflect::set(&global(), &"hcaptcha_callback".into(), &closure).unwrap();
     });
 
-    rsx!(cx, div {
+    cx.render(rsx!(div {
         div {
             dangerous_inner_html: "<div id='h-captcha' data-sitekey='{sitekey}'></div>"
         },
         script {
             "globalThis.hcaptcha_id = hcaptcha.render('h-captcha', {{'callback': hcaptcha_callback}})"
         }
-    })
+    }))
 }

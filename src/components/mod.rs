@@ -30,7 +30,7 @@ pub mod markdown;
 pub mod modal;
 pub mod member_list;
 pub mod context_menu;
-pub mod lazy;
+//pub mod lazy;
 pub mod server_header;
 
 pub use reply::Reply;
@@ -48,6 +48,6 @@ pub use markdown::Markdown;
 pub use modal::Modal;
 pub use member_list::MemberList;
 pub use context_menu::ContextMenu;
-pub use lazy::Lazy;
+//pub use lazy::Lazy;
 pub use message::*;
 pub use server_header::*;

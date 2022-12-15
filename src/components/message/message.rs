@@ -23,22 +23,22 @@ pub struct MessageProps<'a> {
 }
 
 pub fn Message<'a>(cx: Scope<'a, MessageProps<'a>>) -> Element<'a> {
-    let message_state = use_read(&cx, MESSAGES);
-    let channel_state = use_read(&cx, CHANNELS);
-    let server_members = use_read(&cx, SERVER_MEMBERS);
-    let revolt_config = use_config(&cx);
-    let message_builder_state = use_read(&cx, MESSAGE_BUILDERS);
-    let set_message_builders = use_set(&cx, MESSAGE_BUILDERS);
-    let user_state = use_read(&cx, USERS);
-    let currently_editing = use_read(&cx, CURRENTLY_EDITING).as_ref();
-    let set_currently_editing = use_set(&cx, CURRENTLY_EDITING);
-    let context_menu = use_context_menu(&cx);
+    let message_state = use_read(cx, MESSAGES);
+    let channel_state = use_read(cx, CHANNELS);
+    let server_members = use_read(cx, SERVER_MEMBERS);
+    let revolt_config = use_config(cx);
+    let message_builder_state = use_read(cx, MESSAGE_BUILDERS);
+    let set_message_builders = use_set(cx, MESSAGE_BUILDERS);
+    let user_state = use_read(cx, USERS);
+    let currently_editing = use_read(cx, CURRENTLY_EDITING).as_ref();
+    let set_currently_editing = use_set(cx, CURRENTLY_EDITING);
+    let context_menu = use_context_menu(cx);
 
-    let modal = utils::use_modal(&cx);
+    let modal = utils::use_modal(cx);
 
     let message = message_state
-        .get(cx.props.channel_id)?
-        .get(cx.props.message_id)?;
+        .get(cx.props.channel_id).unwrap()
+        .get(cx.props.message_id).unwrap();
 
     let types::Message { content, author, attachments, channel, masquerade, replies, edited, id, .. } = message;
 

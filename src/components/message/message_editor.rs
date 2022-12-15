@@ -25,9 +25,9 @@ pub struct MessageEditorProps<'a> {
 }
 
 pub fn MessageEditor<'a>(cx: Scope<'a, MessageEditorProps<'a>>) -> Element<'a> {
-    let http = use_http(&cx);
-    let set_currently_editing = use_set(&cx, CURRENTLY_EDITING);
-    let content = use_state(&cx, || cx.props.initial_text.clone());
+    let http = use_http(cx);
+    let set_currently_editing = use_set(cx, CURRENTLY_EDITING);
+    let content = use_state(cx, || cx.props.initial_text.clone());
 
     cx.render(rsx! {
         div {

@@ -17,22 +17,22 @@ along with this program.  If not, see https://www.gnu.org/licenses/. */
 use crate::prelude::*;
 
 pub fn ServerList(cx: Scope) -> Element {
-    let set_current_server = use_set(&cx, CURRENT_SERVER);
-    let set_current_channel = use_set(&cx, CURRENT_CHANNEL);
-    let server_state = use_read(&cx, SERVERS);
-    let channel_state = use_read(&cx, CHANNELS);
-    let server_members_state = use_read(&cx, SERVER_MEMBERS);
-    let revolt_config = use_config(&cx);
-    let (_, user_id) = use_read(&cx, USER).as_ref().unwrap();
-    let user_state = use_read(&cx, USERS);
+    let set_current_server = use_set(cx, CURRENT_SERVER);
+    let set_current_channel = use_set(cx, CURRENT_CHANNEL);
+    let server_state = use_read(cx, SERVERS);
+    let channel_state = use_read(cx, CHANNELS);
+    let server_members_state = use_read(cx, SERVER_MEMBERS);
+    let revolt_config = use_config(cx);
+    let (_, user_id) = use_read(cx, USER).as_ref().unwrap();
+    let user_state = use_read(cx, USERS);
 
-    let router = use_router(&cx);
+    let router = use_router(cx);
 
     let user = &user_state[user_id];
 
     let (_, avatar) = get_username_avatar(channel_state, server_members_state, revolt_config, user, &None, None);
 
-    rsx!(cx, div {
+    cx.render(rsx!(div {
         style: "display: flex; width: 56px; min-width: 56px; flex-direction: column; justify-content: flex-start; overflow-y: auto; align-items: center",
         button {
             onclick: move |_| {
@@ -76,5 +76,5 @@ pub fn ServerList(cx: Scope) -> Element {
                 }
             }
         })
-    })
+    }))
 }

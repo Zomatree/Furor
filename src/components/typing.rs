@@ -22,13 +22,13 @@ pub struct TypingProps<'a> {
 }
 
 pub fn Typing<'a>(cx: Scope<'a, TypingProps<'a>>) -> Element<'a> {
-    let typing_state = use_read(&cx, TYPING);
-    let user_state = use_read(&cx, USERS);
-    let server_member_state = use_read(&cx, SERVER_MEMBERS);
-    let channel_state = use_read(&cx, CHANNELS);
-    let revolt_config = use_config(&cx);
+    let typing_state = use_read(cx, TYPING);
+    let user_state = use_read(cx, USERS);
+    let server_member_state = use_read(cx, SERVER_MEMBERS);
+    let channel_state = use_read(cx, CHANNELS);
+    let revolt_config = use_config(cx);
 
-    rsx!(cx, div {
+    cx.render(rsx!(div {
         typing_state.get(cx.props.channel_id).map(|currently_typing| {
             if currently_typing.is_empty() {
                 return rsx! { None::<()> }
@@ -73,5 +73,5 @@ pub fn Typing<'a>(cx: Scope<'a, TypingProps<'a>>) -> Element<'a> {
                 }
             }
         })
-    })
+    }))
 }

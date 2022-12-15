@@ -24,16 +24,16 @@ pub struct ReplyProps<'a> {
 }
 
 pub fn Reply<'a>(cx: Scope<'a, ReplyProps<'a>>) -> Element<'a> {
-    let http = use_http(&cx);
-    let channels_state = use_read(&cx, CHANNELS);
-    let server_members_state = use_read(&cx, SERVER_MEMBERS);
-    let revolt_config = use_config(&cx);
-    let user_state = use_read(&cx, USERS);
+    let http = use_http(cx);
+    let channels_state = use_read(cx, CHANNELS);
+    let server_members_state = use_read(cx, SERVER_MEMBERS);
+    let revolt_config = use_config(cx);
+    let user_state = use_read(cx, USERS);
 
-    let message_state = use_read(&cx, MESSAGES);
-    let set_message_state = use_set(&cx, MESSAGES);
+    let message_state = use_read(cx, MESSAGES);
+    let set_message_state = use_set(cx, MESSAGES);
 
-    let reply = use_state(&cx, || None::<types::Message>);
+    let reply = use_state(cx, || None::<types::Message>);
 
     cx.use_hook(|| cx.spawn({
         let reply = reply.clone();

@@ -22,12 +22,12 @@ pub struct ChannelProps<'a> {
 }
 
 pub fn Channel<'a>(cx: Scope<'a, ChannelProps<'a>>) -> Element<'a> {
-    let channel_state = use_read(&cx, CHANNELS);
-    let user_state = use_read(&cx, USERS);
+    let channel_state = use_read(cx, CHANNELS);
+    let user_state = use_read(cx, USERS);
 
-    let (_, user_id) = use_read(&cx, USER).as_ref().unwrap();
+    let (_, user_id) = use_read(cx, USER).as_ref().unwrap();
 
-    let name = match &channel_state[&cx.props.channel_id] {
+    let name = match &channel_state[cx.props.channel_id] {
         types::Channel::DirectMessage(dm) => {
             let recipient_id = dm.get_recipient(user_id);
             &user_state[recipient_id].username

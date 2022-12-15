@@ -18,15 +18,15 @@ along with this program.  If not, see https://www.gnu.org/licenses/. */
 use crate::prelude::*;
 
 pub fn Channel(cx: Scope) -> Element {
-    redirect_to_login(&cx);
+    redirect_to_login(cx);
 
-    let route = use_route(&cx);
-    let bump = use_alloc(&cx);
+    let route = use_route(cx);
+    let bump = use_alloc(cx);
 
     let server_id = bump.alloc(route.parse_segment::<types::ULID>("server_id").unwrap().unwrap());
     let channel_id = bump.alloc(route.parse_segment::<types::ULID>("channel_id").unwrap().unwrap());
 
-    rsx!(cx, div {
+    cx.render(rsx!(div {
         style: "width: 100%; height: 100%; display: flex; flex-direction: row",
         components::ServerList {},
         div {
@@ -48,5 +48,5 @@ pub fn Channel(cx: Scope) -> Element {
             //     server_id: server_id
             // }
         }
-    })
+    }))
 }

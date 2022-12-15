@@ -17,17 +17,20 @@ along with this program.  If not, see https://www.gnu.org/licenses/. */
 use crate::prelude::*;
 
 pub fn Home(cx: Scope) -> Element {
-    redirect_to_login(&cx);
+    redirect_to_login(cx);
 
-    rsx!(cx, div {
-        style: "width: 100%; height: 100%; display: flex; flex-direction: row",
-        components::ServerList {},
-        div {
-            style: "display: flex; flex-direction: row; flex-grow: 1",
-            components::DirectMessageList {},
-            h1 {
-                "Welcome to Revolt"
+    cx.render(match get_local_storage_user().is_some() {
+        true => rsx!(div {
+            style: "width: 100%; height: 100%; display: flex; flex-direction: row",
+            components::ServerList {},
+            div {
+                style: "display: flex; flex-direction: row; flex-grow: 1",
+                components::DirectMessageList {},
+                h1 {
+                    "Welcome to Revolt"
+                }
             }
-        }
+        }),
+        false => rsx!(components::Loading {})
     })
 }

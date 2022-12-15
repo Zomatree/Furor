@@ -90,9 +90,9 @@ pub fn format_datetime<Tz: chrono::TimeZone>(dt: &chrono::DateTime<Tz>) -> Strin
     let now = chrono::Utc::now();
     let yesterday = now - chrono::Duration::days(1);
 
-    if dt.date() == now.date() {
+    if dt.date_naive() == now.date_naive() {
         dt.format("Today at %H:%M").to_string()
-    } else if dt.date() == yesterday.date() {
+    } else if dt.date_naive() == yesterday.date_naive() {
         dt.format("Yesterday at %H:%M").to_string()
     } else {
         dt.format("%d/%m/%Y").to_string()
@@ -113,8 +113,7 @@ pub fn use_user(cx: &ScopeState) -> (&types::Token, &types::ULID) {
 }
 
 pub fn use_alloc(cx: &ScopeState) -> &Bump {
-    let factory = NodeFactory::new(cx);
-    factory.bump()
+    cx.bump()
 }
 
 #[macro_export]

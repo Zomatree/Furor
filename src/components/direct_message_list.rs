@@ -23,16 +23,16 @@ enum Channel<'a> {
 }
 
 pub fn DirectMessageList(cx: Scope) -> Element {
-    let channels_state = use_read(&cx, CHANNELS);
-    let dm_channels_state = use_read(&cx, DM_CHANNELS);
-    let user_state = use_read(&cx, USERS);
-    let user_id = &use_read(&cx, USER).as_ref().unwrap().1;
-    let server_members_state = use_read(&cx, SERVER_MEMBERS);
-    let revolt_config = use_config(&cx);
+    let channels_state = use_read(cx, CHANNELS);
+    let dm_channels_state = use_read(cx, DM_CHANNELS);
+    let user_state = use_read(cx, USERS);
+    let user_id = &use_read(cx, USER).as_ref().unwrap().1;
+    let server_members_state = use_read(cx, SERVER_MEMBERS);
+    let revolt_config = use_config(cx);
 
-    let router = use_router(&cx);
+    let router = use_router(cx);
 
-    rsx!(cx, div {
+    cx.render(rsx!(div {
         style: "width: 232px; height: 100%; display: flex; flex-direction: column",
         h3 {
             "Direct Messages"
@@ -121,5 +121,5 @@ pub fn DirectMessageList(cx: Scope) -> Element {
                     }
                 })
         }
-    })
+    }))
 }

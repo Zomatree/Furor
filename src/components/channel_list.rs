@@ -22,12 +22,12 @@ pub struct ChannelListProps<'a> {
 }
 
 pub fn ChannelList<'a>(cx: Scope<'a, ChannelListProps<'a>>) -> Element<'a> {
-    let server_state = use_read(&cx, SERVERS);
-    let channel_state = use_read(&cx, CHANNELS);
-    let set_channel = use_set(&cx, CURRENT_CHANNEL);
-    let router = use_router(&cx);
+    let server_state = use_read(cx, SERVERS);
+    let channel_state = use_read(cx, CHANNELS);
+    let set_channel = use_set(cx, CURRENT_CHANNEL);
+    let router = use_router(cx);
 
-    rsx!(cx, div {
+    cx.render(rsx!(div {
         style: "display: flex; flex-direction: column; width: 232px",
         server_state[cx.props.server_id]
             .categories
@@ -76,5 +76,5 @@ pub fn ChannelList<'a>(cx: Scope<'a, ChannelListProps<'a>>) -> Element<'a> {
                     })
                 }
             })
-    })
+    }))
 }

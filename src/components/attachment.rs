@@ -22,12 +22,12 @@ pub struct AttachmentProps {
 }
 
 pub fn Attachment(cx: Scope<AttachmentProps>) -> Element {
-    let revolt_config = use_config(&cx);
+    let revolt_config = use_config(cx);
 
     let AttachmentProps { asset: types::Asset { size, filename, metadata, .. } } = cx.props;
-    let url = cx.props.asset.url(&revolt_config.features.autumn.url);
+    let url = &cx.props.asset.url(&revolt_config.features.autumn.url);
 
-    rsx!(cx, div {
+    cx.render(rsx!(div {
         div {
             style: "padding: 12px; display: flex; flex-direction: row",
             div {
@@ -87,5 +87,5 @@ pub fn Attachment(cx: Scope<AttachmentProps>) -> Element {
                 })
             },
         }
-    })
+    }))
 }

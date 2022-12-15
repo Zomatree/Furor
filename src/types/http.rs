@@ -127,7 +127,6 @@ pub enum LoginBody {
     Details {
         email: String,
         password: String,
-        captcha: Option<String>,
         friendly_name: Option<String>
     },
     Mfa {
