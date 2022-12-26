@@ -43,31 +43,24 @@ pub fn ChannelList<'a>(cx: Scope<'a, ChannelListProps<'a>>) -> Element<'a> {
                                 let cloned_id = channel.id.clone();
 
                                 rsx! {
-                                    button {
+                                    components::Button {
                                         key: "{cloned_id}",
-                                        style: "display: flex; flex-direction: row",
                                         onclick: move |_| {
                                             set_channel(Some(channel.id.clone()));
                                             set_last_channel(cx.props.server_id.clone(), channel.id.clone());
 
                                             router.push_route(&format!("/server/{}/channel/{}", cx.props.server_id, channel.id), None, None);
                                         },
-                                        span {
-                                            "# ",
-                                            "{channel.name}"
-                                        },
+                                        "# {channel.name}"
                                     }
                                 }
                             },
                             types::Channel::VoiceChannel(channel) => {
                                 rsx! {
-                                    button {
+                                    components::Button {
                                         key: "{channel.id}",
-                                        style: "display: flex; flex-direction: row",
-                                        span {
-                                            "V ",
-                                            "{channel.name}"
-                                        },
+                                        onclick: |_| {},
+                                        "V {channel.name}"
                                     }
                                 }
                             },

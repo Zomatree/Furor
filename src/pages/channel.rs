@@ -22,12 +22,13 @@ pub fn Channel(cx: Scope) -> Element {
 
     let route = use_route(cx);
     let bump = use_alloc(cx);
+    let theme = use_theme(cx);
 
     let server_id = bump.alloc(route.parse_segment::<types::ULID>("server_id").unwrap().unwrap());
     let channel_id = bump.alloc(route.parse_segment::<types::ULID>("channel_id").unwrap().unwrap());
 
     cx.render(rsx!(div {
-        style: "width: 100%; height: 100%; display: flex; flex-direction: row",
+        style: "width: 100%; height: 100%; display: flex; flex-direction: row; background-color: {theme.secondary_background}",
         components::ServerList {},
         div {
             style: "display: flex; flex-direction: row; flex-grow: 1",

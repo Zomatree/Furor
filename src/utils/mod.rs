@@ -23,6 +23,7 @@ mod channel;
 mod files;
 mod context_menu;
 mod r#async;
+mod theme;
 
 use dioxus::core::exports::bumpalo::Bump;
 pub use modal::*;
@@ -32,6 +33,7 @@ pub use channel::*;
 pub use files::*;
 pub use context_menu::*;
 pub use r#async::*;
+pub use theme::*;
 
 pub fn get_username_avatar(
     channels: &ChannelState,
@@ -110,6 +112,10 @@ pub fn use_config(cx: &ScopeState) -> &types::RevoltConfig {
 pub fn use_user(cx: &ScopeState) -> (&types::Token, &types::ULID) {
     let user = use_read(cx, USER).as_ref().unwrap();
     (&user.0, &user.1)
+}
+
+pub fn use_theme(cx: &ScopeState) -> &Theme {
+    use_read(cx, THEME)
 }
 
 pub fn use_alloc(cx: &ScopeState) -> &Bump {

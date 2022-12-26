@@ -136,7 +136,7 @@ pub enum LoginBody {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Copy)]
 pub enum MFAMethod {
     Password,
     Recovery,

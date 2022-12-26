@@ -36,6 +36,7 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
     let users = use_read(cx, USERS);
 
     let http = use_http(cx);
+    let theme = use_theme(cx);
 
     let channel_messages = message_state.get(cx.props.channel_id).cloned().unwrap_or_default();
 
@@ -57,7 +58,7 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
     let attachment_set_message_builder = set_message_builders.clone();
 
     cx.render(rsx!(div {
-        style: "display: flex; flex-direction: column",
+        style: "display: flex; flex-direction: column; background-color: {theme.message_box}",
         div {
             style: "display: flex; flex-direction: column",
             div {
@@ -90,7 +91,7 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
                         "{username}",
                         message.content.as_ref().map(|content| rsx! {content.as_str() }),
 
-                        button {
+                        components::Button {
                             onclick: move |_| {
                                 let message_builder = message_builder1.clone();
                                 let mut replies = message_builder.replies.as_ref().unwrap().clone();
@@ -109,7 +110,7 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
                                 "@ off"
                             },
                         },
-                        button {
+                        components::Button {
                             onclick: move |_| {
                                 let message_builder = message_builder2.clone();
                                 let mut replies = message_builder.replies.as_ref().unwrap().clone();
@@ -128,8 +129,7 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
         }
         div {
             style: "min-height: 48px; display: flex; flex-direction: row",
-            button {
-                style: "with: 10%",
+            components::Button {
                 onclick: move |_| {
                     let attachments_message_builder = attachments_message_builder.clone();
                     let attachment_set_message_builder = attachment_set_message_builder.clone();
@@ -142,10 +142,13 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
                         attachment_set_message_builder(message_builders);
                     });
                 },
-                "Upload"
+                div {
+                    style: "with: 10%",
+                    "Upload"
+                }
             }
-            input {
-                style: "flex-grow: 1",
+            textarea {
+                style: "flex-grow: 1; background: transparent; border-width: 0",
                 onkeydown: move |evt| {
 
                     if evt.code() == Code::ArrowUp && edit_message_builder.content.as_ref().map(|content| content.is_empty()).unwrap_or(true) {
@@ -164,8 +167,7 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
                     set_message_builders(message_builders);
                 }
             },
-            button {
-                style: "width: 10%",
+            components::Button {
                 onclick: move |_| {
                     let channel_id = cx.props.channel_id.clone();
                     let http = http.clone();
@@ -177,7 +179,10 @@ pub fn MessageArea<'a>(cx: Scope<'a, MessageAreaProps<'a>>) -> Element<'a> {
                         ).await;
                     })
                 },
-                "Send"
+                div {
+                    style: "width: 10%",
+                    "Send"
+                }
             }
         }
     }))

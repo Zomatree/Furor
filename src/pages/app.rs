@@ -81,7 +81,31 @@ pub fn App(cx: Scope) -> Element {
 
     let set_saved_messages = use_set(cx, SAVED_MESSAGES);
 
+    let theme = use_theme(cx);
+
     log::info!("{user:?} {revolt_config:?}");
+
+    if revolt_config.is_none() {
+        let set_config = set_config.clone();
+
+        cx.spawn(async move {
+            let client = reqwest::Client::new();
+
+            let res = client.get(API_URL)
+                .send()
+                .await
+                .unwrap()
+                .json::<types::RevoltConfig>()
+                .await
+                .unwrap();
+
+            set_config(Some(res));
+        });
+
+        return cx.render(rsx! {
+            components::Loading {}
+        })
+    }
 
     if let Some((token, user_id)) = user && let Some(config) = revolt_config && http_state.is_none() {
         LocalStorage::set("user", (token.clone(), user_id.clone())).unwrap();
@@ -133,46 +157,33 @@ pub fn App(cx: Scope) -> Element {
                 set_ready.clone()
             ).await;
         })
-    } else if user.is_some() && http_state.is_none() {
-        let set_config = set_config.clone();
-
-        cx.spawn(async move {
-            let client = reqwest::Client::new();
-
-            let res = client.get(API_URL)
-                .send()
-                .await
-                .unwrap()
-                .json::<types::RevoltConfig>()
-                .await
-                .unwrap();
-
-            set_config(Some(res));
-        })
     };
 
     cx.render(rsx!(Router {
-        components::ContextMenu {},
-        components::Modal {},
-        Route {
-            to: "/",
-            pages::Home {}
-        },
-        Route {
-            to: "/login",
-            pages::Login {}
-        },
-        Route {
-            to: "/server/:server_id/channel/:channel_id",
-            loading_ready!(ready, pages::Channel)
-        }
-        Route {
-            to: "/channel/:channel_id",
-            loading_ready!(ready, pages::DmChannel)
-        },
-        Route {
-            to: "/saved_messages",
-            loading_ready!(ready, pages::SavedMessages)
+        div {
+            style: "color: {theme.foreground}; width: 100%; height: 100%",
+            components::ContextMenu {},
+            components::Modal {},
+            Route {
+                to: "/",
+                pages::Home {}
+            },
+            Route {
+                to: "/login",
+                pages::Login {}
+            },
+            Route {
+                to: "/server/:server_id/channel/:channel_id",
+                loading_ready!(ready, pages::Channel)
+            }
+            Route {
+                to: "/channel/:channel_id",
+                loading_ready!(ready, pages::DmChannel)
+            },
+            Route {
+                to: "/saved_messages",
+                loading_ready!(ready, pages::SavedMessages)
+            }
         }
     }))
 }

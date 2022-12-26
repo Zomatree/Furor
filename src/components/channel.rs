@@ -24,6 +24,7 @@ pub struct ChannelProps<'a> {
 pub fn Channel<'a>(cx: Scope<'a, ChannelProps<'a>>) -> Element<'a> {
     let channel_state = use_read(cx, CHANNELS);
     let user_state = use_read(cx, USERS);
+    let theme = use_theme(cx);
 
     let (_, user_id) = use_read(cx, USER).as_ref().unwrap();
 
@@ -37,7 +38,7 @@ pub fn Channel<'a>(cx: Scope<'a, ChannelProps<'a>>) -> Element<'a> {
 
     cx.render(rsx! {
         div {
-            style: "display: flex; flex-direction: column; width: 100%",
+            style: "display: flex; flex-direction: column; width: 100%; background-color: {theme.primary_background}",
             div {
                 style: "height: 48px; width: 100%",
                 "{name}"

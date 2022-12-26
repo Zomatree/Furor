@@ -15,6 +15,8 @@ along with this program.  If not, see https://www.gnu.org/licenses/. */
 
 
 pub mod message;
+pub mod native;
+
 pub mod reply;
 pub mod attachment;
 pub mod channel_messages;
@@ -49,5 +51,7 @@ pub use modal::Modal;
 pub use member_list::MemberList;
 pub use context_menu::ContextMenu;
 //pub use lazy::Lazy;
-pub use message::*;
 pub use server_header::*;
+
+pub use message::*;
+pub use native::*;

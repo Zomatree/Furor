@@ -196,7 +196,7 @@ impl HTTPClient {
                 .file_name(filename)
             );
 
-        let request = self.client.request(Method::POST, &format!("{}/{tag}", self.revolt_config.features.autumn.url))
+        let request = self.client.request(Method::POST, format!("{}/{tag}", self.revolt_config.features.autumn.url))
             .multipart(multipart);
 
         self.send(request)

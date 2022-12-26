@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-dioxus = { git="https://github.com/DioxusLabs/dioxus/", features = ["macro", "hooks", "html"] }
-fermi = { git="https://github.com/DioxusLabs/dioxus/" }
-dioxus-router = { git="https://github.com/DioxusLabs/dioxus/" }
-dioxus-web = { git="https://github.com/DioxusLabs/dioxus/" }
+dioxus = { git="https://github.com/DioxusLabs/dioxus/", features = ["macro", "hooks", "html"], branch = "jk/suspense-rollover" }
+fermi = { git="https://github.com/DioxusLabs/dioxus/", branch = "jk/suspense-rollover" }
+dioxus-router = { git="https://github.com/DioxusLabs/dioxus/", branch = "jk/suspense-rollover" }
+dioxus-web = { git="https://github.com/DioxusLabs/dioxus/", branch = "jk/suspense-rollover" }
 
 async-std = { version = "1.0" }
 serde = { version = "1.0.133", features = ["derive"] }
@@ -29,3 +29,4 @@ async-recursion = "1.0.0"
 comrak = "0.13.2"
 web-sys = { version = "*", features = ["Document", "Window", "Element", "HtmlElement", "FileList", "Node", "Blob", "IntersectionObserver", "IntersectionObserverEntry", "IntersectionObserverInit"] }
 wasm-bindgen-futures = "0.4.32"
+async-trait = "0.1.60"

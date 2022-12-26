@@ -53,6 +53,7 @@ pub fn MessageReaction<'a>(cx: Scope<'a, MessageReactionProps<'a>>) -> Element<'
                 });
             },
             border_color: format_args!("{}", if cx.props.reacted { "yellow" } else { "buttonborder" }),
+            key: "{cx.props.emoji}",
             "{cx.props.emoji} {cx.props.count}",
         }
     })

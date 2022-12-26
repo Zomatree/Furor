@@ -29,34 +29,34 @@ pub fn DirectMessageList(cx: Scope) -> Element {
     let user_id = &use_read(cx, USER).as_ref().unwrap().1;
     let server_members_state = use_read(cx, SERVER_MEMBERS);
     let revolt_config = use_config(cx);
+    let theme = use_theme(cx);
 
     let router = use_router(cx);
 
     cx.render(rsx!(div {
-        style: "width: 232px; height: 100%; display: flex; flex-direction: column",
+        style: "width: 232px; height: 100%; display: flex; flex-direction: column; background-color: {theme.secondary_background}; gap: 5px",
         h3 {
             "Direct Messages"
         },
-        button {
+        components::Button {
             onclick: move |_| {
                 router.push_route("/", None, None);
             },
             "Home"
         },
-        button {
-            "Friends"
+        components::Button {
+            "Friends",
+            onclick: move |_| {},
         },
-        button {
-            onclick: move |_| {
-                router.push_route("/saved_messages", None, None);
-            },
+        components::Button {
+            onclick: move |_| {},
             "Saved Notes"
         },
         h3 {
             "Conversations"
         },
         div {
-            style: "flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column",
+            style: "flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 5px",
             dm_channels_state.iter()
                 .filter_map(|channel| {
                     let channel = channels_state.get(channel)?;
@@ -74,44 +74,54 @@ pub fn DirectMessageList(cx: Scope) -> Element {
                     };
 
                     rsx!{
-                        button {
+                        Link {
                             key: "{id}",
-                            style: "gap: 8px; text-align: start;",
-                            onclick: move |_| {
-                                router.push_route(&format!("/channel/{id}"), None, None);
-                            },
-                            match match_channel {
-                                Channel::Dm(dm) => {
-                                    let user_id = dm.get_recipient(user_id);
-                                    let user = user_state.get(user_id).unwrap();
-                                    let (username, avatar) = get_username_avatar(channels_state, server_members_state, revolt_config, user, &None, None);
+                            to: "/channel/{id}",
+                            div {
+                                style: "display: flex; gap: 8px; text-align: start; color: {theme.tertiary_foreground}; padding: 0 8px; align-items: center",
+                                match match_channel {
+                                    Channel::Dm(dm) => {
+                                        let user_id = dm.get_recipient(user_id);
+                                        let user = user_state.get(user_id).unwrap();
+                                        let (username, avatar) = get_username_avatar(channels_state, server_members_state, revolt_config, user, &None, None);
+                                        let bottom_text = user.status.text
+                                            .as_deref()
+                                            .unwrap_or_else(|| user.status.presence.as_str());
 
-                                    rsx! {
-                                        Fragment {
-                                            components::Icon {
-                                                src: avatar
-                                            },
-                                            span {
-                                                "{username}"
-                                            }
-                                        }
-                                    }
-                                },
-                                Channel::Group(group) => {
-
-                                    rsx! {
-                                        Fragment {
-                                            group.icon.as_ref().map(|icon| {
-                                                let url = icon.url(&revolt_config.features.autumn.url);
-
-                                                rsx! {
-                                                    components::Icon {
-                                                        src: url
+                                        rsx! {
+                                            Fragment {
+                                                components::Icon {
+                                                    src: avatar
+                                                },
+                                                div {
+                                                    div {
+                                                        style: "font-weight: 600; font-size: .90625rem; text-overflow: ellipsis; white-space: nowrap; overflow: none",
+                                                        "{username}"
+                                                    },
+                                                    div {
+                                                        style: "font-weight: 500; font-size: .6875rem; text-overflow: ellipsis; white-space: nowrap; overflow: none",
+                                                        "{bottom_text}"
                                                     }
                                                 }
-                                            }),
-                                            span {
-                                                "{group.name}"
+                                            }
+                                        }
+                                    },
+                                    Channel::Group(group) => {
+
+                                        rsx! {
+                                            Fragment {
+                                                group.icon.as_ref().map(|icon| {
+                                                    let url = icon.url(&revolt_config.features.autumn.url);
+
+                                                    rsx! {
+                                                        components::Icon {
+                                                            src: url
+                                                        }
+                                                    }
+                                                }),
+                                                span {
+                                                    "{group.name}"
+                                                }
                                             }
                                         }
                                     }

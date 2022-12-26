@@ -36,16 +36,30 @@ pub struct UserRelation {
     pub status: RelationStatus
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Default)]
 pub enum UserPresence {
+    Focus,
     Busy,
     Idle,
     #[serde(rename = "Invisible")]
+    #[default]
     Offline,
     Online
 }
 
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+impl UserPresence {
+    pub fn as_str(&self) -> &str {
+        match self {
+            UserPresence::Focus => "Focus",
+            UserPresence::Busy => "Busy",
+            UserPresence::Idle => "Idle",
+            UserPresence::Offline => "Offline",
+            UserPresence::Online => "Online",
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Default)]
 pub struct UserStatus {
     pub text: Option<String>,
     #[serde(default = "offline_presence")]
@@ -70,7 +84,8 @@ pub struct User {
     #[serde(default)]
     pub badges: u16,
 
-    pub status: Option<UserStatus>,
+    #[serde(default)]
+    pub status: UserStatus,
 
     #[serde(default = "no_relation")]
     pub relationship: RelationStatus,

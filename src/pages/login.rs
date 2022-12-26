@@ -37,8 +37,8 @@ enum LoginState {
 impl LoginState {
     pub fn button_text(&self) -> &'static str {
         match self {
-            Self::Details  { .. } | Self::SelectMfa { .. } => "Login",
-            Self::InputMfa { .. } => "Next"
+            Self::Details  { .. } => "Login",
+            Self::InputMfa { .. } | Self::SelectMfa { .. } => "Next"
         }
     }
 }
@@ -57,156 +57,172 @@ pub fn Login(cx: Scope) -> Element {
     let text = login_state.get().button_text();
 
     cx.render(rsx!(div {
-        style: "display: flex; align-content: center",
+        style: "height: 100%; width: 100%; background-image: url('https://images.unsplash.com/photo-1652195598569-f523c6973b42'); display: flex; flex-direction: column; justify-content: center",
         div {
-            style: "display: flex; justify-content: center",
-            match login_state.get() {
-                LoginState::Details { .. } => {
-                    rsx! {
-                        input {
-                            placeholder: "Email",
-                            oninput: |evt| login_state.with_mut(|state| {
-                                if let LoginState::Details { email, .. } = state {
-                                    *email = evt.value.clone()
-                                };
-                            })
-                        },
-                        input {
-                            placeholder: "Password",
-                            oninput: |evt| login_state.with_mut(|state| {
-                                if let LoginState::Details { password, .. } = state {
-                                    *password = evt.value.clone()
-                                };
-                            })
-                        },
-                    }
+            style: "border-width: 1px; border-radius: 5px; background-color: rgba(0,0,0,.5); margin-left: 50px; z-index: 10; position: absolute",
+            div {
+                style: "padding: 20px",
+                p {
+                    style: "font-weight: 900; margin-top: 0px",
+                    "LOGIN"
                 },
-                LoginState::SelectMfa { allowed_methods, ticket, .. } => {
-                    rsx! {
-                        select {
-                            oninput: move |evt| {
-                                let selection = match evt.value.as_str() {
-                                    "Password" => types::MFAMethod::Password,
-                                    "Recovery Code" => types::MFAMethod::Recovery,
-                                    "Totp Code" => types::MFAMethod::Totp,
-                                    _ => unreachable!()
-                                };
-                                login_state.set(LoginState::SelectMfa { allowed_methods: allowed_methods.clone(), selection: Some(selection), ticket: ticket.clone() })
-                            },
-                            allowed_methods.iter().map(|method| {
-                                rsx!{
-                                    option {
-                                        key: "{method}",
-                                        label: "{method}",
-                                        value: "{method}",
-                                        "{method}"
-                                    }
-                                }
-                            }),
-                        }
-                    }
-                },
-                LoginState::InputMfa { method, ticket, .. } => {
-                    rsx! {
-                        input {
-                            oninput: move |evt| {
-                                login_state.set(LoginState::InputMfa { method: method.clone(), ticket: ticket.clone(), value: match &method {
-                                    types::MFAMethod::Password => types::MfaResponse::Password(evt.value.clone()),
-                                    types::MFAMethod::Recovery => types::MfaResponse::RecoveryCode(evt.value.clone()),
-                                    types::MFAMethod::Totp => types::MfaResponse::TotpCode(evt.value.clone()),
-                                }})
-                            },
-                            placeholder: "{method}"
-                        }
-                    }
-                }
-            },
-            button {
-                onclick: move |_| {
+                div {
+                    style: "display: flex; flex-direction: column; justify-content: center; gap: 6px",
                     match login_state.get() {
-                        LoginState::Details { email, password } => {
-                            let set_config = set_config.clone();
-                            let set_user = set_user.clone();
-                            let login_state = login_state.clone();
-                            let client = client.clone();
-                            let email = email.clone();
-                            let password = password.clone();
-
-                            cx.spawn(async move {
-                                let res = client.get(API_URL)
-                                    .send()
-                                    .await
-                                    .unwrap()
-                                    .json::<types::RevoltConfig>()
-                                    .await
-                                    .unwrap();
-
-                                set_config(Some(res));
-
-                                let res = client.post(format!("{API_URL}/auth/session/login"))
-                                    .json(&types::LoginBody::Details {
-                                        email,
-                                        password,
-                                        friendly_name: Some(env!("CARGO_PKG_NAME").to_string())
+                        LoginState::Details { .. } => {
+                            rsx! {
+                                components::Input {
+                                    placeholder: "Email",
+                                    oninput: |evt: Event<FormData>| login_state.with_mut(|state| {
+                                        if let LoginState::Details { email, .. } = state {
+                                            *email = evt.value.clone()
+                                        };
                                     })
-                                    .send()
-                                    .await
-                                    .unwrap()
-                                    .json::<types::Login>()
-                                    .await
-                                    .unwrap();
-
-                                match res {
-                                    types::Login::Success { user_id, token, .. } => {
-                                        set_user(Some((types::Token::User(token), types::ULID(user_id))));
-                                    },
-                                    types::Login::Mfa { ticket, allowed_methods } => {
-                                        login_state.set(LoginState::SelectMfa { allowed_methods, ticket, selection: None })
-                                    },
-                                }
-                            });
-
-                        },
-                        LoginState::SelectMfa { selection, ticket, .. } => {
-                            if let Some(method) = selection {
-                                login_state.set(LoginState::InputMfa { method: method.clone(), ticket: ticket.clone(), value: match method {
-                                    types::MFAMethod::Password => types::MfaResponse::Password(String::new()),
-                                    types::MFAMethod::Recovery => types::MfaResponse::RecoveryCode(String::new()),
-                                    types::MFAMethod::Totp => types::MfaResponse::TotpCode(String::new()),
-                                } })
+                                },
+                                components::Input {
+                                    placeholder: "Password",
+                                    oninput: |evt: Event<FormData>| login_state.with_mut(|state| {
+                                        if let LoginState::Details { password, .. } = state {
+                                            *password = evt.value.clone()
+                                        };
+                                    })
+                                },
                             }
                         },
-                        LoginState::InputMfa { ticket, value, .. } => {
-                            let client = client.clone();
-                            let ticket = ticket.clone();
-                            let value = value.clone();
-                            let set_user = set_user.clone();
-                            let router = router.clone();
-
-                            cx.spawn(async move {
-                                let res = client.post(format!("{API_URL}/auth/session/login"))
-                                    .json(&types::LoginBody::Mfa {
-                                        mfa_ticket: ticket,
-                                        mfa_response: value,
-                                        friendly_name: Some(env!("CARGO_PKG_NAME").to_string())
-                                    })
-                                    .send()
-                                    .await
-                                    .unwrap()
-                                    .json::<types::Login>()
-                                    .await
-                                    .unwrap();
-
-                                if let types::Login::Success { user_id, token, .. } = res {
-                                    set_user(Some((types::Token::User(token), types::ULID(user_id))));
-                                    router.push_route("/", None, None);
+                        LoginState::SelectMfa { allowed_methods, .. } => {
+                            rsx! {
+                                select {
+                                    oninput: move |evt| {
+                                        let selection_method = match evt.value.as_str() {
+                                            "Password" => types::MFAMethod::Password,
+                                            "Recovery Code" => types::MFAMethod::Recovery,
+                                            "Totp Code" => types::MFAMethod::Totp,
+                                            _ => unreachable!()
+                                        };
+                                        login_state.with_mut(|state| {
+                                            if let LoginState::SelectMfa { selection, .. } = state {
+                                                *selection = Some(selection_method);
+                                            };
+                                        })                                    },
+                                    allowed_methods.iter().map(|method| {
+                                        rsx!{
+                                            option {
+                                                key: "{method}",
+                                                label: "{method}",
+                                                value: "{method}",
+                                                "{method}"
+                                            }
+                                        }
+                                    }),
                                 }
-                            });
+                            }
+                        },
+                        LoginState::InputMfa { method, ticket, .. } => {
+                            rsx! {
+                                components::Input {
+                                    oninput: move |evt: Event<FormData>| {
+                                        login_state.set(LoginState::InputMfa { method: *method, ticket: ticket.clone(), value: match &method {
+                                            types::MFAMethod::Password => types::MfaResponse::Password(evt.value.clone()),
+                                            types::MFAMethod::Recovery => types::MfaResponse::RecoveryCode(evt.value.clone()),
+                                            types::MFAMethod::Totp => types::MfaResponse::TotpCode(evt.value.clone()),
+                                        }})
+                                    },
+                                    placeholder: "{method}"
+                                }
+                            }
                         }
+                    },
+                    components::Button {
+                        onclick: move |_| {
+                            match login_state.get() {
+                                LoginState::Details { email, password } => {
+                                    let set_config = set_config.clone();
+                                    let set_user = set_user.clone();
+                                    let login_state = login_state.clone();
+                                    let client = client.clone();
+                                    let email = email.clone();
+                                    let password = password.clone();
+
+                                    cx.spawn(async move {
+                                        let res = client.get(API_URL)
+                                            .send()
+                                            .await
+                                            .unwrap()
+                                            .json::<types::RevoltConfig>()
+                                            .await
+                                            .unwrap();
+
+                                        set_config(Some(res));
+
+                                        let res = client.post(format!("{API_URL}/auth/session/login"))
+                                            .json(&types::LoginBody::Details {
+                                                email,
+                                                password,
+                                                friendly_name: Some(env!("CARGO_PKG_NAME").to_string())
+                                            })
+                                            .send()
+                                            .await
+                                            .unwrap()
+                                            .json::<types::Login>()
+                                            .await
+                                            .unwrap();
+
+                                        match res {
+                                            types::Login::Success { user_id, token, .. } => {
+                                                set_user(Some((types::Token::User(token), types::ULID(user_id))));
+                                            },
+                                            types::Login::Mfa { allowed_methods, ticket } => {
+                                                login_state.set(LoginState::SelectMfa { allowed_methods, selection: None, ticket })
+                                            },
+                                        }
+                                    });
+
+                                },
+                                LoginState::SelectMfa { selection, ticket, .. } => {
+                                    log::info!("{selection:?}");
+
+                                    if let Some(method) = selection {
+                                        login_state.set(LoginState::InputMfa { method: *method, ticket: ticket.clone(), value: match method {
+                                            types::MFAMethod::Password => types::MfaResponse::Password(String::new()),
+                                            types::MFAMethod::Recovery => types::MfaResponse::RecoveryCode(String::new()),
+                                            types::MFAMethod::Totp => types::MfaResponse::TotpCode(String::new()),
+                                        } })
+                                    }
+                                },
+                                LoginState::InputMfa { ticket, value, .. } => {
+                                    let client = client.clone();
+                                    let ticket = ticket.clone();
+                                    let value = value.clone();
+                                    let set_user = set_user.clone();
+                                    let router = router.clone();
+
+                                    cx.spawn(async move {
+                                        let res = client.post(format!("{API_URL}/auth/session/login"))
+                                            .json(&types::LoginBody::Mfa {
+                                                mfa_ticket: ticket,
+                                                mfa_response: value,
+                                                friendly_name: Some(env!("CARGO_PKG_NAME").to_string())
+                                            })
+                                            .send()
+                                            .await
+                                            .unwrap()
+                                            .json::<types::Login>()
+                                            .await
+                                            .unwrap();
+
+                                        if let types::Login::Success { user_id, token, .. } = res {
+                                            set_user(Some((types::Token::User(token), types::ULID(user_id))));
+                                            router.push_route("/", None, None);
+                                        }
+                                    });
+                                }
+                            }
+                        },
+                        "{text}"
                     }
-                },
-                "{text}"
+                }
             }
         }
+
     }))
 }

@@ -25,6 +25,7 @@ pub fn ServerList(cx: Scope) -> Element {
     let revolt_config = use_config(cx);
     let (_, user_id) = use_read(cx, USER).as_ref().unwrap();
     let user_state = use_read(cx, USERS);
+    let theme = use_theme(cx);
 
     let router = use_router(cx);
 
@@ -33,17 +34,21 @@ pub fn ServerList(cx: Scope) -> Element {
     let (_, avatar) = get_username_avatar(channel_state, server_members_state, revolt_config, user, &None, None);
 
     cx.render(rsx!(div {
-        style: "display: flex; width: 56px; min-width: 56px; flex-direction: column; justify-content: flex-start; overflow-y: auto; align-items: center",
-        button {
-            onclick: move |_| {
-                router.push_route("/", None, None);
-            },
-            components::Icon {
-                src: avatar,
-                height: 42,
-                width: 42,
+        style: "display: flex; width: 56px; min-width: 56px; flex-direction: column; justify-content: flex-start; overflow-y: auto; align-items: center; background-color: {theme.background}",
+        Link {
+            to: "/",
+            div {
+                style: "background: none; border: none",
+                components::Icon {
+                    src: avatar,
+                    height: 42,
+                    width: 42,
+                }
             }
-        }
+        },
+        div {
+            style: "display: flex; margin: 6px auto; user-select: none; align-items: center; height: 1px; width: calc(100% - 10px); background: {theme.secondary_header}"
+        },
         server_state.values().map(|server| {
             let types::Server { icon, id, .. } = server.clone();
 
@@ -52,6 +57,7 @@ pub fn ServerList(cx: Scope) -> Element {
 
             rsx! {
                 button {
+                    style: "background: none; border: none",
                     key: "{key}",
                     onclick: move |_| {
                         set_current_server(Some(id.clone()));

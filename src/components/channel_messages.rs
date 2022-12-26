@@ -37,7 +37,7 @@ pub fn ChannelMessages<'a>(cx: Scope<'a, ChannelProps<'a>>) -> Element<'a> {
 
     cx.render(rsx! {
         div {
-            style: "display: flex; flex-direction: column; width: 100%; flex-grow: 1; background-color: grey; overflow-y: scroll",
+            style: "display: flex; flex-direction: column; width: 100%; flex-grow: 1; overflow-y: scroll",
             messages.iter().map(|message| {
                 rsx! {
                     div {

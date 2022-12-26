@@ -55,3 +55,4 @@ pub static SAVED_MESSAGES: Atom<Option<types::SavedMessages>> = |_| None;
 pub static MODALS: Atom<Vec<utils::ActiveModal>> = |_| Vec::new();
 pub static MESSAGE_BUILDERS: Atom<HashMap<types::ULID, utils::MessageBuilder>> = |_| HashMap::new();
 pub static CONTEXT_MENU: Atom<Option<ActiveContextMenu>> = |_| None;
+pub static THEME: Atom<Theme> = |_| Theme::dark();

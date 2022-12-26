@@ -92,10 +92,10 @@ pub fn Message<'a>(cx: Scope<'a, MessageProps<'a>>) -> Element<'a> {
                 style: "display: flex; flex-direction: row",
                 div {
                     style: "display: flex; flex-direction: row; width: 62px",
-                    img {
-                        src: "{avatar}",
-                        width: "44",
-                        height: "44"
+                    components::Icon {
+                        src: avatar,
+                        width: 44,
+                        height: 44
                     },
                 },
                 div {

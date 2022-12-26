@@ -34,6 +34,7 @@ pub fn Icon(cx: Scope<IconProps>) -> Element {
 
     cx.render(rsx! {
         img {
+            style: "border-radius: 50%",
             src: "{cx.props.src}",
             height: "{height}",
             width: "{width}"
