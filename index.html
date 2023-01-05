@@ -5,18 +5,34 @@
   <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
   <meta http-equiv="Content-Type" name="viewport" content="width=device-width, initial-scale=1.0" charset="UTF-8">
   <meta charset="UTF-8" />
-  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 
   {style_include}
   <style>
     * {
-      font-family: Arial, Helvetica, sans-serif;
+      text-rendering: optimizeLegibility!important;
+      -webkit-font-smoothing: antialiased;
+      box-sizing: border-box;
+    }
+
+    :root {
+      font-family: 'Inter', sans-serif;
+    }
+
+    @supports (font-variation-settings: normal) {
+      :root {
+        font-family: 'Inter var', sans-serif;
+      }
     }
 
     a, a:link, a:visited, a:hover {
       text-decoration: none;
     }
 
+    textarea:active, textarea:focus-visible {
+      outline: 0;
+    }
     </style>
 </head>
 <body style="margin: 0px; width: 100vw; height: 100vh">

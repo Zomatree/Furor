@@ -1,0 +1,13 @@
+text = { (!NEWLINE ~ ANY)+ | NEWLINE }
+
+header_start = { "#"{1, 6} }
+header = { header_start ~ node }
+
+inner_bold = { (!"**" ~ text)+ }
+bold = { "**" ~ inner_bold ~ "**" }
+
+inline_codeblock_inner = { (!"`" ~ ANY)+ }
+inline_codeblock = { "`" ~ inline_codeblock_inner ~ "`" }
+
+node = { header | bold | text }
+file = { (node ~ NEWLINE?)+ }

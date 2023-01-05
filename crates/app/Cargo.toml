@@ -1,0 +1,36 @@
+[package]
+name = "furor-app"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dioxus = { git="https://github.com/DioxusLabs/dioxus/", features = ["macro", "hooks", "html"], branch = "jk/suspense-rollover" }
+fermi = { git="https://github.com/DioxusLabs/dioxus/", branch = "jk/suspense-rollover" }
+dioxus-router = { git="https://github.com/DioxusLabs/dioxus/", branch = "jk/suspense-rollover" }
+dioxus-web = { git="https://github.com/DioxusLabs/dioxus/", branch = "jk/suspense-rollover" }
+
+async-std = { version = "1.0" }
+serde = { version = "1.0.133", features = ["derive"] }
+serde_json = "1.0.75"
+futures = "0.3.19"
+im-rc = "15.0.0"
+log = "0.4.6"
+wasm-logger = "0.2.0"
+lru-cache = "*"
+reqwest = { version = "0.11.9", features = ["json", "multipart", "stream"] }
+ws_stream_wasm = "0.7.3"
+ulid = "0.5.0"
+chrono = { version = "0.4" }
+getrandom = { version = "0.2", features = ["js"] }
+gloo = "0.8.0"
+js-sys = "0.3.57"
+wasm-bindgen = "0.2.80"
+async-recursion = "1.0.0"
+comrak = "0.13.2"
+web-sys = { version = "*", features = ["Document", "Window", "Element", "HtmlElement", "FileList", "Node", "Blob", "IntersectionObserver", "IntersectionObserverEntry", "IntersectionObserverInit"] }
+wasm-bindgen-futures = "0.4.32"
+async-trait = "0.1.60"
+rand = "0.8.5"
+
+furor-core = { path = "../core" }
+furor-markdown = { path = "../markdown" }
