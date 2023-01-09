@@ -30,7 +30,7 @@ pub fn ChannelList<'a>(cx: Scope<'a, ChannelListProps<'a>>) -> Element<'a> {
     let router = use_router(cx);
 
     cx.render(rsx!(div {
-        style: "display: flex; flex-direction: column; width: 232px; padding: 6px",
+        style: "display: flex; flex-direction: column; width: 232px; padding: 6px; overflow: hidden scroll; height: 100%",
         server_state[cx.props.server_id]
             .categories
             .iter()
